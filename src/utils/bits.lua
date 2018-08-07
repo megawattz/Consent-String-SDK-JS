@@ -1,23 +1,21 @@
-LUA_PATH='./?.lua'
-LUAC_PATH='./?.so'
-
 local definitions = require('definitions')
 local base64 = require('base64')
+local utils = require('utils')
 
-function makestring(count, str)
-      str = str or '0'
-      return str:rep(count)
+local function makestring(count, str)
+   str = str or '0'
+   return str:rep(count)
 end
 
-function padLeft(str, padding)
-   return makestring(max(0, padding)) + str
+local function padLeft(str, padding)
+   return makestring(math.max(0, padding)) .. str
 end
 
-function padRight(str, padding) 
-   return str + makestring(max(0, padding))
+local function padRight(str, padding) 
+   return str .. makestring(math.max(0, padding))
 end
 
-function reverse(t)
+local function reverse(t)
    local nt = {} -- new table
    local size = #t + 1
    for k,v in ipairs(t) do
@@ -26,7 +24,7 @@ function reverse(t)
    return nt
 end
 
-function tobits(num)
+local function tobits(num)
    local t={}
    while num>0 do
       rest=num%2
@@ -37,7 +35,7 @@ function tobits(num)
    return table.concat(t)
 end
 
-function encodeIntToBits(number, numBits) 
+local function encodeIntToBits(number, numBits) 
    local bitString = ''
 
    if type(number) == 'number' then
@@ -51,28 +49,28 @@ function encodeIntToBits(number, numBits)
 
    -- Truncate the str if longer than the number of bits
    if bitString:len() > numBits then
-      bitString = bitString:strsub(1, numBits)
+      bitString = bitString:sub(1, numBits)
    end
 
    return bitString
 end
 
-function encodeBoolToBits(value)
-   if (value == true) then
+local function encodeBoolToBits(value)
+   if value == true then
       return encodeIntToBits(1)
    end
    return encodeIntToBits(0)
 end
 
-function encodeDateToBits(date, numBits)  -- date is deciseconds since epoch
+local function encodeDateToBits(date, numBits)  -- date is deciseconds since epoch
    encodeIntToBits(date, numBits)
 end
 
-function encodeLetterToBits(letter, numBits) 
+local function encodeLetterToBits(letter, numBits) 
    return encodeIntToBits(letter:upper():byte() - 65, numBits)
 end
 
-function slice(table, first, last)
+local function slice(table, first, last)
    local sliced = {}
    
    for i = first or 1, last or #tbl, step or 1 do
@@ -82,37 +80,37 @@ function slice(table, first, last)
    return sliced
 end
 
-function encodeLanguageToBits(language, numBits)
+local function encodeLanguageToBits(language, numBits)
    numBits = numBits or 12
    return encodeLetterToBits(language.slice(0, 1), numBits / 2)
-      + encodeLetterToBits(language.slice(1), numBits / 2)
+      .. encodeLetterToBits(language.slice(1), numBits / 2)
 end
 
-function decodeBitsToInt(bitString, start, length) 
-   return tonumber(bitString.strsub(start, length), 2)
+local function decodeBitsToInt(bitString, start, length) 
+   return tonumber(bitString:sub(start, length), 2)
 end
 
-function decodeBitsToDate(bitString, start, length) 
+local function decodeBitsToDate(bitString, start, length) 
    return decodeBitsToInt(bitString, start, length)
 end
 
-function decodeBitsToBool(bitString, start) 
-   return tonumber(bitString.strsub(start, 1), 2) == 1
+local function decodeBitsToBool(bitString, start) 
+   return tonumber(bitString:sub(start, 1), 2) == 1
 end
 
-function decodeBitsToLetter(bitString) 
+local function decodeBitsToLetter(bitString) 
    local letterCode = decodeBitsToInt(bitString)
    return string.lower(string.char(letterCode + 65))
 end
 
-function decodeBitsToLanguage(bitString, start, length) 
-   local languageBitString = bitString.substr(start, length)
+local function decodeBitsToLanguage(bitString, start, length) 
+   local languageBitString = bitString:substr(start, length)
    
    return decodeBitsToLetter(languageBitString.slice(0, length / 2))
-      + decodeBitsToLetter(languageBitString.slice(length / 2))
+      .. decodeBitsToLetter(languageBitString.slice(length / 2))
 end
 
-function encodeField(input_and_field)  -- { input, field } 
+local function encodeField(input_and_field)  -- { input, field } 
    local name, field_type, numBits, encoder, validator = unpack(input_field)
 
    if type(validator) == 'function' then
@@ -143,7 +141,7 @@ function encodeField(input_and_field)  -- { input, field }
    elseif field_type == 'bits' then
       return padRight(fieldValue, bitCount - fieldValue.length).substring(0, bitCount)
    elseif field_type == 'list' then
-      return fieldValue.reduce(function(acc, listValue)
+      return fieldValue.utils.reduce(function(acc, listValue)
 	    acc = acc .. encodeFields({input = listValue, fields = field.fields })
 	    return acc end, '')
    elseif field_type == 'language' then
@@ -153,22 +151,14 @@ function encodeField(input_and_field)  -- { input, field }
    end
 end
 
-function reduce(t, func, start)
-   local acc = start or ''
-   for index, value in t do
-      acc = func(acc, value, index, t)
-   end
-   return acc
-end
-
-function encodeFields(input_and_fields)
+local function encodeFields(input_and_fields)
    local input, fields = unpack(input_and_fields)
-   return fields.reduce(function(acc, value)
+   return fields.utils.reduce(function(acc, value)
 	 acc = acc .. encodeField({input, field})
-			end, '')
+			      end, '')
 end
 
-function decodeField(input_output_start_field)
+local function decodeField(input_output_start_field)
    local field_type, numBits, decoder, validator, listCount  = unpack(input_output_start_field)
 
    if type(validator) == 'function' then
@@ -212,7 +202,7 @@ function decodeField(input_output_start_field)
       error("list type not implemented")
       --[[
 	 local rval = {}
-	 rval = reduce(function(acc)
+	 rval = utils.reduce(function(acc)
 	 local decodedObject, newPosition  = unpack decodeFields({input, fields: field.fields, startPosition: acc.newPosition})
 	 return {fieldValue: [...acc.fieldValue, decodedObject], newPosition, end
 	 end), { fieldValue: [], newPosition: startPosition })
@@ -222,11 +212,11 @@ function decodeField(input_output_start_field)
    end
 end
 
-function decodeFields(input_fields_start) 
+local function decodeFields(input_fields_start) 
    local input, fields, startPosition = unpack(input_fields_start)
    local position = startPosition or 0
 
-   local decodedObject = fields.reduce(function(acc, field)
+   local decodedObject = fields.utils.reduce(function(acc, field)
 	 local name, numBits = unpack(field)
 	 local fieldValue, newPosition =
 	    unpack(decodeField({
@@ -246,7 +236,7 @@ function decodeFields(input_fields_start)
 	 end
 	 
 	 return acc
-				       end, {})
+					     end, {})
    
    return { decodedObject, newPosition = position }
 end
@@ -256,7 +246,7 @@ end
    * either `selectedVendorIds` or the `vendorRangeList` depending on
    * the value of the `isRange` flag.
 --]]
-function encodeDataToBits(data, definitionMap) 
+local function encodeDataToBits(data, definitionMap) 
    local version = unpack(data)
 
    if type(version) ~= 'number' then
@@ -272,10 +262,10 @@ end
 --[[*
    * Take all fields required to encode the consent str and produce the URL safe Base64 encoded value
 --]]
-function encodeToBase64(data_definitionMap)
+local function encodeToBase64(data_definitionMap)
    data, definitionMap = unpack(data_definitionMap)
 
-   definitionMap = definitionMap or vendorVersionMap
+   definitionMap = definitionMap or definitions.vendorVersionMap
    
    local binaryValue = encodeDataToBits(data, definitionMap)
 
@@ -286,7 +276,7 @@ function encodeToBase64(data_definitionMap)
       -- Encode to bytes
       local bytes = ''
       for i = 1, paddedBinaryValue:len(), 8 do
-	 bytes = bytes .. String.char(tonumber(paddedBinaryValue.strsub(i, 8), 2))
+	 bytes = bytes .. String.char(tonumber(paddedBinaryValue:sub(i, 8), 2))
       end
    end
 
@@ -294,14 +284,14 @@ function encodeToBase64(data_definitionMap)
    return base64.encode(bytes):gsub('%+', '-'):gsub('%/', '_'):gsub('=*$', '')
 end
 
-function decodeConsentStringBitValue(bitString, definitionMap)
-   definitionMap = definitionMap or vendorVersionMap
+local function decodeConsentStringBitValue(bitString, definitionMap)
+   definitionMap = definitionMap or definitions.vendorVersionMap
    
    local version = decodeBitsToInt(bitString, 0, versionNumBits)
 
    if type(version) ~= 'number' then
       error('ConsentString - Unknown version number in the str to decode')
-   elseif not vendorVersionMap[version] then
+   elseif not definitions.vendorVersionMap[version] then
       error(string.format('ConsentString - Unsupported version %s in the str to decode', version))
    end
 
@@ -314,10 +304,10 @@ end
 --[[*
    * Decode the (URL safe Base64) value of a consent str into an object.
 --]]
-function decodeFromBase64(consentString, definitionMap) 
+local function decodeFromBase64(consentString, definitionMap) 
    -- Add padding
    local unsafe = consentString
-   while unsafe.length % 4 ~= 0 do
+   while unsafe:len() % 4 ~= 0 do
       unsafe = unsave .. '='
    end
    
@@ -329,29 +319,33 @@ function decodeFromBase64(consentString, definitionMap)
    local inputBits = ''
    
    for i = 1, bytes:len(), 1 do
-      local bitString = bytes.charCodeAt(i).toString(2)
-      inputBits = inputBits .. padLeft(bitString, 8 - bitString.length)
+      local bitString = utils.tostringbase(bytes:byte(i), 2)
+      inputBits = inputBits .. padLeft(bitString, 8 - bitString:len())
    end
    
    return decodeConsentStringBitValue(inputBits, definitionMap)
 end
 
-function split(str, pattern)
+local function split(str, pattern)
    local rval = {}
    str:gsub('[^'..pattern..']', function(d) table.insert(rval, d) end)
    return rval
 end
 
-function decodeBitsToIds(bitString)
+local function decodeBitsToIds(bitString)
    local rval = {}
    bitString:gsub('.', function(c) table.insert(rval, c) end)
-   reduce(function(acc, value, index, rval) 
+   utils.reduce(function(acc, value, index, rval) 
 	 if value == '1' then
 	    if acc.indexOf(index + 1) == -1 then
 	       acc.push(index + 1)
 	    end
 	 end
 	 return acc
-	  end, {})
+		end, {})
    return rval
 end
+
+return {
+   decodeFromBase64 = decodeFromBase64,
+}

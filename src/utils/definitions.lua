@@ -1,4 +1,3 @@
-
 --[[*
    * Number of bits for encoding the version integer
    * Expected to be the same across versions
@@ -75,3 +74,6 @@ local vendorVersionMap = {
    },
 };
 
+return {
+   vendorVersionMap = vendorVersionMap
+}
