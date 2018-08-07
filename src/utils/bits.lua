@@ -86,8 +86,14 @@ local function encodeLanguageToBits(language, numBits)
       .. encodeLetterToBits(language.slice(1), numBits / 2)
 end
 
-local function decodeBitsToInt(bitString, start, length) 
-   return tonumber(bitString:sub(start, length), 2)
+local function decodeBitsToInt(bitString, start, length)
+   local convert = bitString:sub(start, length)
+   utils.reveal(string.format("decodeBitsToInt:%s start:%s length:%s = %s",
+			      bitString,
+			      start,
+			      length,
+			      convert))
+   return tonumber(convert, 2)
 end
 
 local function decodeBitsToDate(bitString, start, length) 
@@ -286,8 +292,10 @@ end
 
 local function decodeConsentStringBitValue(bitString, definitionMap)
    definitionMap = definitionMap or definitions.vendorVersionMap
+
+   --utils.reveal(utils.as_string(definitionMap))
    
-   local version = decodeBitsToInt(bitString, 0, versionNumBits)
+   local version = decodeBitsToInt(bitString, 1, versionNumBits)
 
    if type(version) ~= 'number' then
       error('ConsentString - Unknown version number in the str to decode')

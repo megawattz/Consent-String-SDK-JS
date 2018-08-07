@@ -1,3 +1,5 @@
+-- Generally useful functions
+
 function iftrue(check, iftrue, iffalse)
    if check then
       return iftrue
@@ -39,6 +41,23 @@ function tostringbase(n, b)
       table.insert(t, 1, digits:sub(d,d))
    until n == 0
    return sign .. table.concat(t,"")
+end
+
+local DebugLevel = 5
+
+function get_location(upstack) -- get a location up the stack (not very useful to display Debug.set as the location)
+   upstack = upstack or 3
+   local debug_info = debug.getinfo(upstack)
+   if debug_info == nil then return "unknown" end
+   local fullpath = debug_info["short_src"]
+   local file = fullpath:match("[^/]+$")
+   return string.format("%s:%d", file, debug_info["linedefined"])
+end      
+   
+function reveal(message, priority)
+   priority = priority or 5
+   if priority > DebugLevel then return end
+   print(string.format("%s\t%s", get_location(), message))
 end
 
 -- convert data to string. If a table is passed, recurse down until
@@ -88,5 +107,6 @@ return {
    tostringbase = tostringbase,
    reduce = reduce,
    find = fine,
+   reveal = reveal
 }
                                                                                           
