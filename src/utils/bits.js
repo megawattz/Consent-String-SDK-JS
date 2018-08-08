@@ -193,8 +193,8 @@ function decodeFields({ input, fields, startPosition = 0 }) {
     const { name, numBits } = field;
     const { fieldValue, newPosition } = decodeField({
       input,
-      output =  acc,
-      startPosition =  position,
+      output: acc,
+      startPosition: position,
       field,
     });
 
