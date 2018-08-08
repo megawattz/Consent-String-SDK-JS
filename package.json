@@ -47,7 +47,7 @@
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-mocha": "^4.11.0",
     "jsdoc": "^3.5.5",
-    "mocha": "^3.4.2",
+    "mocha": "^3.5.3",
     "nyc": "^11.0.2",
     "sinon": "^4.5.0"
   }
