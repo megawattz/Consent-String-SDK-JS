@@ -1,0 +1,46 @@
+# Loads the dev environment for creation and debugging of tests (as opposed to Dockerfile.prod which just runs the program as it would in production
+FROM debian:8.7
+
+RUN date && apt-get -y update
+
+# Installing required packages
+RUN apt-get install -y --fix-missing git curl emacs lua-mode ngrep tmux vim man make
+
+RUN apt-get -y remove nodejs
+
+VOLUME /source
+
+RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+
+ENV NODE_VERSION 10.4.1
+
+ENV NVM_DIR /root/.nvm
+
+RUN . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+#RUN apt-get install -y --fix-missing lua5.2 lua5.2-doc
+RUN apt-get install -y --fix-missing libluajit-5.1 libluajit-5.1-common libluajit-5.1-dev luajit
+
+RUN apt-get install -y --fix-missing luarocks libpcre3 libpcre3-dev
+RUN luarocks install lrexlib-pcre
+
+#RUN git clone https://github.com/InteractiveAdvertisingBureau/Consent-String-SDK-JS.git
+#RUN git clone https://github.com/wizzard0/js2lua.git
+
+WORKDIR /app
+ADD . .
+RUN pwd
+RUN ls
+
+ENV PATH $PATH:/app/node_modules/.bin
+
+RUN . $NVM_DIR/nvm.sh && npm config set scrict-ssl false \
+      && npm update \
+      && npm install chai mocha \
+      && npm install
+
+
+
