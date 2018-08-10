@@ -30,12 +30,16 @@ RUN luarocks install lrexlib-pcre
 #RUN git clone https://github.com/InteractiveAdvertisingBureau/Consent-String-SDK-JS.git
 #RUN git clone https://github.com/wizzard0/js2lua.git
 
-WORKDIR /app
-ADD . .
-RUN pwd
-RUN ls
+WORKDIR /source
 
-ENV PATH $PATH:/app/node_modules/.bin
+#ADD . .
+#RUN pwd
+#RUN ls
+
+ENV PATH $PATH:/source/node_modules/.bin
+
+ENV LUA_PATH ;;../src/?.lua;../src/utils/?.lua
+ENV LUA_CPATH ;;../src/utils/?.so
 
 RUN . $NVM_DIR/nvm.sh && npm config set scrict-ssl false \
       && npm update \

@@ -23,7 +23,7 @@ function decodeConsentString(consentString)
    consentScreen,
    consentLanguage
       = bits.decodeFromBase64(consentString);
-   
+
    local consentStringData = {
       version = version,
       cmpId = cmpId,
@@ -36,6 +36,8 @@ function decodeConsentString(consentString)
       consentScreen = consentScreen,
       consentLanguage = consentLanguage,
    };
+   
+   utils.reveal("lua decodeFromBase64:"..utils.as_string(consentStringData));
    
    if isRange then
       local idMap = bits.reduce(vendorRangeList, function(acc, isrange_startvendorid_endvendorid)
