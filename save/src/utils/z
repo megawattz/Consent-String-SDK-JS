@@ -1,0 +1,5 @@
+as_string = function(value, options, level) 
+function tostringbase(b, n)
+function reduce(t, start, func)
+function find(item, t)
+function iftrue(check, iffalse, iftrue)
