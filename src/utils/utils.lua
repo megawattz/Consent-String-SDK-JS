@@ -1,13 +1,13 @@
 -- Generally useful functions
 
-function iftrue(check, iftrue, iffalse)
+local function iftrue(check, iftrue, iffalse)
    if check then
       return iftrue
    end
    return iffalse
 end
 
-function find(t, item)
+local function find(t, item)
    for k, v in pairs(t) do
       if v == item then
 	 return k
@@ -16,7 +16,7 @@ function find(t, item)
    return nil
 end
 
-function reduce(t, func, start)
+local function reduce(t, func, start)
    local acc = start or ''
    for index, value in t do
       acc = func(acc, value, index, t)
@@ -24,7 +24,7 @@ function reduce(t, func, start)
    return acc
 end
 
-function tostringbase(n, b)
+local function tostringbase(n, b)
    n = math.floor(n)
    b = b or 10
    if b == 10 then return tostring(n) end
@@ -45,7 +45,7 @@ end
 
 local DebugLevel = 5
 
-function get_location(upstack) -- get a location up the stack (not very useful to display Debug.set as the location)
+local function get_location(upstack) -- get a location up the stack (not very useful to display Debug.set as the location)
    upstack = upstack or 3
    local debug_info = debug.getinfo(upstack)
    if debug_info == nil then return "unknown" end
@@ -54,7 +54,7 @@ function get_location(upstack) -- get a location up the stack (not very useful t
    return string.format("%s:%d", file, debug_info["linedefined"])
 end      
    
-function reveal(message, priority)
+local function reveal(message, priority)
    priority = priority or 5
    if priority > DebugLevel then return end
    print(string.format("%s\t%s", get_location(), message))
@@ -72,7 +72,7 @@ end
 -- example: as_string(person, {inner=": ", outer="\n"
 -- level is an internal value used for recursion.
 
-as_string = function(value, options, level)
+local function as_string(value, options, level)
    options = options or {}
    if options.limit and level > options.limit then return end
    options.quotes = options.quotes or true
@@ -109,4 +109,5 @@ return {
    find = fine,
    reveal = reveal
 }
-                                                                                          
+
+

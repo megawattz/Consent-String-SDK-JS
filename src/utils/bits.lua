@@ -88,13 +88,11 @@ end
 
 local function decodeBitsToInt(bitString, start, length)
    local convert = bitString:sub(start, length)
-   --[[
    utils.reveal(string.format("decodeBitsToInt:%s start:%s length:%s = %s",
 			      bitString,
 			      start,
 			      length,
 			      convert))
-   --]]
    return tonumber(convert, 2)
 end
 

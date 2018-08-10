@@ -65,7 +65,7 @@ function decodeConsentString(consentString)
    return consentStringData;
 end
 
-local rval = decodeConsentString('BOQ7WlgOQ7WlgABACDENABwAAABJOACgACAAQABA')
-
-print(utils.as_string(rval))
+return {
+   decodeConsentString = decodeConsentString
+}
 
