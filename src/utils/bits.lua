@@ -230,21 +230,24 @@ local function decodeFields(input_fields_start)
    local input, fields, startPosition =
       input_fields_start.input,
    input_fields_start.fields,
-   input_fields_start.startPosition;
+   input_fields_start.startPosition or 1;
    
    utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
 
    local position = startPosition or 0
    
    local decodedObject = utils.reduce(fields, function(acc, field)
-	 local name, numBits = unpack(field)
-	 local fieldValue, newPosition =
-	    unpack(decodeField({
+					 local name, numBits = field.name, field.numBits
+					 GET THE PARAMETERS TO DECODE FIELD RIGHT!!!
+	 --decodeField expects(datatype, numBits, decoder, validator, listCount)
+	 local decoded = decodeField({
 			 input,
 			 output = acc,
 			 startPosition = position,
 			 field
-	    }))
+	    })
+	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
+	 
 	 if fieldValue then
 	    acc[name] = fieldValue
 	 end
