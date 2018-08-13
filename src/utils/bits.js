@@ -65,7 +65,11 @@ function encodeLanguageToBits(language, numBits = 12) {
 }
 
 function decodeBitsToInt(bitString, start, length) {
-  return parseInt(bitString.substr(start, length), 2);
+    const rval = parseInt(bitString.substr(start, length), 2);
+    
+    console.log(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
+
+    return rval;
 }
 
 function decodeBitsToDate(bitString, start, length) {
