@@ -1,8 +1,6 @@
---[[*
-   * Number of bits for encoding the version integer
-   * Expected to be the same across versions
---]]
-local versionNumBits = 6;
+-- Version needs to be the same size always
+
+local versionNumBits = 6
 
 --[[*
    * Definition of the consent string encoded format
@@ -75,5 +73,6 @@ local vendorVersionMap = {
 };
 
 return {
-   vendorVersionMap = vendorVersionMap
+   vendorVersionMap = vendorVersionMap,
+   versionNumBits = versionNumBits
 }

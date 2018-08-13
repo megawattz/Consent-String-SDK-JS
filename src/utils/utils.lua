@@ -18,7 +18,7 @@ end
 
 local function reduce(t, func, start)
    local acc = start or ''
-   for index, value in t do
+   for index, value in ipairs(t) do
       acc = func(acc, value, index, t)
    end
    return acc

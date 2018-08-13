@@ -166,8 +166,13 @@ local function encodeFields(input_and_fields)
 end
 
 local function decodeField(input_output_start_field)
-   local field_type, numBits, decoder, validator, listCount  = unpack(input_output_start_field)
-
+   local datatype, numBits, decoder, validator, listCount =
+      input_output_start_field.datatype,
+   input_output_start_field.numBits,
+   input_output_start_field.decoder,
+   input_output_start_field.validator,
+   input_output_start_field.listCount
+   
    if type(validator) == 'function' then
       if (not validator(output)) then
 	 -- Not decoding this field so make sure we start parsing the
@@ -193,7 +198,7 @@ local function decodeField(input_output_start_field)
       listEntryCount = listCount
    end
 
-   local switch_type = field_type
+   local switch_type = datatype
    
    if switch_type == 'int' then
       return { fieldValue = decodeBitsToInt(input, startPosition, bitCount) }
@@ -215,15 +220,23 @@ local function decodeField(input_output_start_field)
 	 end), { fieldValue: [], newPosition: startPosition })
       --]]
    else
-      error(string.format("ConsentString - Unknown field type %s for decoding", switch_type))
+      error(string.format("ConsentString - Unknown field type:%s", switch_type))
    end
 end
 
-local function decodeFields(input_fields_start) 
-   local input, fields, startPosition = unpack(input_fields_start)
-   local position = startPosition or 0
+local function decodeFields(input_fields_start)
+   utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
+   
+   local input, fields, startPosition =
+      input_fields_start.input,
+   input_fields_start.fields,
+   input_fields_start.startPosition;
+   
+   utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
 
-   local decodedObject = fields.utils.reduce(function(acc, field)
+   local position = startPosition or 0
+   
+   local decodedObject = utils.reduce(fields, function(acc, field)
 	 local name, numBits = unpack(field)
 	 local fieldValue, newPosition =
 	    unpack(decodeField({
@@ -301,6 +314,10 @@ local function decodeConsentStringBitValue(bitString, definitionMap)
 
    local version = decodeBitsToInt(bitString, 1, definitions.versionNumBits)
 
+   utils.reveal(string.format("versionNumBits:%s version:%s",
+			      definitions.versionNumBits,
+			      version));
+   
    if type(version) ~= 'number' then
       error('ConsentString - Unknown version number in the str to decode')
    elseif not definitions.vendorVersionMap[version] then
@@ -308,7 +325,7 @@ local function decodeConsentStringBitValue(bitString, definitionMap)
    end
 
    local fields = definitionMap[version].fields
-   local decodedObject = decodeFields({ input = bitString, fields })
+   local decodedObject = decodeFields({ input = bitString, fields = fields})
    
    return decodedObject
 end
