@@ -165,13 +165,13 @@ local function encodeFields(input_and_fields)
 			      end, '')
 end
 
-local function decodeField(input_output_start_field)
+local function decodeField(in_out_start_field)
    local datatype, numBits, decoder, validator, listCount =
-      input_output_start_field.datatype,
-   input_output_start_field.numBits,
-   input_output_start_field.decoder,
-   input_output_start_field.validator,
-   input_output_start_field.listCount
+      in_out_start_field.datatype,
+   in_out_start_field.numBits,
+   in_out_start_field.decoder,
+   in_out_start_field.validator,
+   in_out_start_field.listCount
    
    if type(validator) == 'function' then
       if (not validator(output)) then
@@ -227,25 +227,21 @@ end
 local function decodeFields(input_fields_start)
    utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
    
-   local input, fields, startPosition =
-      input_fields_start.input,
-   input_fields_start.fields,
-   input_fields_start.startPosition or 1;
+   local input, fields, startPosition = input_fields_start.input, input_fields_start.fields, input_fields_start.startPosition or 1;
    
    utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
 
    local position = startPosition or 0
    
-   local decodedObject = utils.reduce(fields, function(acc, field)
-					 local name, numBits = field.name, field.numBits
-					 GET THE PARAMETERS TO DECODE FIELD RIGHT!!!
-	 --decodeField expects(datatype, numBits, decoder, validator, listCount)
+   local decodedObject = utils.reduce(
+      fields, function(acc, field)
+	 local name, numBits = field.name, field.numBits
 	 local decoded = decodeField({
-			 input,
-			 output = acc,
-			 startPosition = position,
-			 field
-	    })
+	       input,
+	       output = acc,
+	       startPosition = position,
+	       field
+	 })
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
 	 
 	 if fieldValue then
@@ -259,7 +255,7 @@ local function decodeFields(input_fields_start)
 	 end
 	 
 	 return acc
-					     end, {})
+	      end, {})
    
    return { decodedObject, newPosition = position }
 end
