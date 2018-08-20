@@ -1,8 +1,8 @@
 /* eslint no-use-before-define: off */
 
 const utils = require('./utils');
-
 const base64 = require('base-64');
+
 const {
   versionNumBits,
   vendorVersionMap,
@@ -69,7 +69,7 @@ function encodeLanguageToBits(language, numBits = 12) {
 function decodeBitsToInt(bitString, start, length) {
     const rval = parseInt(bitString.substr(start, length), 2);
     
-    utils.revealconsole.trace(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
+    utils.reveal(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
 
     return rval;
 }
