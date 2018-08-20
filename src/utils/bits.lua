@@ -165,7 +165,7 @@ local function decodeField(in_out_start_field)
    local input, output, startPosition, field =
       in_out_start_field.input,
    in_out_start_field.output,
-   in_out_start_field.Position,
+   in_out_start_field.startPosition,
    in_out_start_field.field
    
    local datatype, numBits, decoder, validator, listCount =
