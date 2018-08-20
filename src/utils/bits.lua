@@ -88,6 +88,7 @@ end
 
 local function decodeBitsToInt(bitString, start, length)
    start = start or 1
+   length = length or 6
    local to_convert = bitString:sub(start, start + length - 1)
    local rval = tonumber(to_convert, 2)
    utils.reveal(string.format("decodeBitsToInt:%s start:%s length:%s rval:%s", bitString, start, length, rval))
@@ -111,14 +112,14 @@ end
 local function decodeBitsToLanguage(bitString, start, length)
    utils.reveal(string.format("decodeBitsToLanguage: string:%s start:%s length:%s", bitString, start, length))
 
-   local languageBitString = bitString:sub(start, length)
+   local languageBitString = bitString:sub(start, start + length - 1)
    
    utils.reveal("languageBitString:"..utils.vardata(languageBitString))
 
    length = length or 0
 
    local str1 = languageBitString:sub(1, length / 2)
-   local str2 = languageBitString:sub(length / 2)
+   local str2 = languageBitString:sub(length / 2 + 1)
    
    utils.reveal("str1:"..str1)
    utils.reveal("str2:"..str2)
