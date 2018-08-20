@@ -69,7 +69,7 @@ function encodeLanguageToBits(language, numBits = 12) {
 function decodeBitsToInt(bitString, start, length) {
     const rval = parseInt(bitString.substr(start, length), 2);
     
-    //utils.reveal(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
+    utils.reveal(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
 
     return rval;
 }

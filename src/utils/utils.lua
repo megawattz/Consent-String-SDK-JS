@@ -101,11 +101,21 @@ local function as_string(value, options, level)
    return rval
 end
 
+function vardata(variable)
+   local rval = {
+      ['type'] = type(variable),
+      value = as_string(variable),
+      size = variable:len() or "n/a"
+   }
+   return as_string(rval)
+end
+
 return {
    iftrue = iftrue,
    as_string = as_string,
    tostringbase = tostringbase,
    reduce = reduce,
+   vardata = vardata,
    find = fine,
    reveal = reveal
 }
