@@ -106,11 +106,14 @@ local function decodeBitsToLetter(bitString)
    return string.lower(string.char(letterCode + 65))
 end
 
-local function decodeBitsToLanguage(bitString, start, length) 
-   local languageBitString = bitString:substr(start, length)
-   
-   return decodeBitsToLetter(languageBitString.slice(0, length / 2))
+local function decodeBitsToLanguage(bitString, start, length)
+   utils.reveal(string.format("string:%s start:%s length:%s", bitString, start, length))
+   local languageBitString = bitString:sub(start, length)
+   local rval = decodeBitsToLetter(languageBitString.slice(0, length / 2))
       .. decodeBitsToLetter(languageBitString.slice(length / 2))
+
+   utils.reveal(string.format("decodeBitsToLanguage: %s", rval))
+   return rval
 end
 
 local function encodeField(input_and_field)  -- { input, field } 
@@ -142,7 +145,7 @@ local function encodeField(input_and_field)  -- { input, field }
    elseif field_type == case 'date' then
       return encodeDateToBits(fieldValue, bitCount)
    elseif field_type == 'bits' then
-      return padRight(fieldValue, bitCount - fieldValue.length).substring(0, bitCount)
+      return padRight(fieldValue, bitCount - fieldValue.length):sub(1, bitCount)
    elseif field_type == 'list' then
       return fieldValue.utils.reduce(function(acc, listValue)
 	    acc = acc .. encodeFields({input = listValue, fields = field.fields })
@@ -211,7 +214,7 @@ local function decodeField(in_out_start_field)
    elseif switch_type == 'date' then
       return { fieldValue = decodeBitsToDate(input, startPosition, bitCount) }
    elseif switch_type == 'bits' then
-      return { fieldValue = input.substr(startPosition, bitCount) }
+      return { fieldValue = input:sub(startPosition, bitCount) }
    elseif switch_type == 'language' then
       return { fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) }
    elseif switch_type == 'list' then

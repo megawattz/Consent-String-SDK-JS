@@ -88,10 +88,15 @@ function decodeBitsToLetter(bitString) {
 }
 
 function decodeBitsToLanguage(bitString, start, length) {
-  const languageBitString = bitString.substr(start, length);
+    utils.reveal(utils.sprintf("string:%s start:%s length:%s", bitString, start, length))
+    const languageBitString = bitString.substr(start, length);
+    
+    var rval = decodeBitsToLetter(languageBitString.slice(0, length / 2))
+	+ decodeBitsToLetter(languageBitString.slice(length / 2));
+    
+    utils.reveal(utils.sprintf("decodeBitsToLanguage: %s", rval))
 
-  return decodeBitsToLetter(languageBitString.slice(0, length / 2))
-    + decodeBitsToLetter(languageBitString.slice(length / 2));
+    return rval
 }
 
 function encodeField({ input, field }) {
