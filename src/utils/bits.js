@@ -88,13 +88,13 @@ function decodeBitsToLetter(bitString) {
 }
 
 function decodeBitsToLanguage(bitString, start, length) {
-    --utils.reveal(utils.sprintf("string:%s start:%s length:%s", bitString, start, length))
+    //utils.reveal(utils.sprintf("string:%s start:%s length:%s", bitString, start, length))
     const languageBitString = bitString.substr(start, length);
-
+    
     const str1 = languageBitString.slice(0, length / 2)
     const str2 = languageBitString.slice(length / 2)
 
-    --utils.reveal(utils.sprintf("str1:%s str2:%s", str1, str2))
+    //utils.reveal(utils.sprintf("str1:%s str2:%s", str1, str2))
 
     var rval = decodeBitsToLetter(str1)	+ decodeBitsToLetter(str2);
     
@@ -326,6 +326,7 @@ function decodeFromBase64(consentString, definitionMap) {
 }
 
 function decodeBitsToIds(bitString) {
+    utils.reveal("decodeBitsToIds:"+bitString)
     return bitString.split('').reduce((acc, bit, index) => {
 	if (bit === '1') {
 	    if (acc.indexOf(index + 1) === -1) {

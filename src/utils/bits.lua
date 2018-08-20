@@ -387,8 +387,11 @@ local function split(str, pattern)
 end
 
 local function decodeBitsToIds(bitString)
+   bitString = bitString or ""
+   utils.reveal("decodeBitsToIds:"..bitString)
    local rval = {}
    bitString:gsub('.', function(c) table.insert(rval, c) end)
+
    utils.reduce(function(acc, value, index, rval) 
 	 if value == '1' then
 	    if acc.indexOf(index + 1) == -1 then
@@ -402,4 +405,5 @@ end
 
 return {
    decodeFromBase64 = decodeFromBase64,
+   decodeBitsToIds = decodeBitsToIds
 }

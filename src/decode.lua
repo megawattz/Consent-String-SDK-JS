@@ -24,6 +24,8 @@ function decodeConsentString(consentString)
    consentLanguage
       = bits.decodeFromBase64(consentString);
 
+   utils.reveal("purposeIdBitString:"..utils.as_string{bits.decodeFromBase64(consentString)} )
+   
    local consentStringData = {
       version = version,
       cmpId = cmpId,
