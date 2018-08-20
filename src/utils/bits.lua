@@ -162,12 +162,18 @@ local function encodeFields(input_and_fields)
 end
 
 local function decodeField(in_out_start_field)
+   local input, output, startPosition, field =
+      in_out_start_field.input,
+   in_out_start_field.output,
+   in_out_start_field.Position,
+   in_out_start_field.field
+   
    local datatype, numBits, decoder, validator, listCount =
-      in_out_start_field.datatype,
-   in_out_start_field.numBits,
-   in_out_start_field.decoder,
-   in_out_start_field.validator,
-   in_out_start_field.listCount
+      field.datatype, field.numBits, field.decoder, field.validator, field.listCount
+
+   utils.reveal(string.format("decodeField:%s", utils.as_string(in_out_start_field)))
+     utils.reveal(string.format("type:%s numBits:%s decoder:%s validator:%s listCount:%s", datatype, numBits, decoder, validator, listCount))
+
    
    if type(validator) == 'function' then
       if (not validator(output)) then
@@ -178,7 +184,9 @@ local function decodeField(in_out_start_field)
    end
    
    if type(decoder) == 'function' then
-      return decoder(input, output, startPosition)
+      local rval = decoder(input, output, startPosition)
+      utils.reveal("LUADecode:%s = %s", field.name, rval)
+      return rval
    end
    
    local bitCount = numButs
@@ -221,22 +229,22 @@ local function decodeField(in_out_start_field)
 end
 
 local function decodeFields(input_fields_start)
-   utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
+   -- utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
    
    local input, fields, startPosition = input_fields_start.input, input_fields_start.fields, input_fields_start.startPosition or 1;
    
-   utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
+   -- utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
 
-   local position = startPosition or 0
+   local position = startPosition or 1
    
    local decodedObject = utils.reduce(
       fields, function(acc, field)
 	 local name, numBits = field.name, field.numBits
 	 local decoded = decodeField({
-	       input,
+	       input = input,
 	       output = acc,
 	       startPosition = position,
-	       field
+	       field = field
 	 })
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
 	 
@@ -304,14 +312,11 @@ local function decodeConsentStringBitValue(bitString, definitionMap)
 
    --utils.reveal(utils.as_string(definitionMap))
    
-   utils.reveal(string.format("bitString:%s definitions.versionNumBits:%s",
-			       bitString, definitions.versionNumBits))
+   -- utils.reveal(string.format("bitString:%s definitions.versionNumBits:%s", bitString, definitions.versionNumBits))
 
    local version = decodeBitsToInt(bitString, 1, definitions.versionNumBits)
 
-   utils.reveal(string.format("versionNumBits:%s version:%s",
-			      definitions.versionNumBits,
-			      version));
+   -- utils.reveal(string.format("versionNumBits:%s version:%s",definitions.versionNumBits, version));
    
    if type(version) ~= 'number' then
       error('ConsentString - Unknown version number in the str to decode')

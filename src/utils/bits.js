@@ -69,7 +69,7 @@ function encodeLanguageToBits(language, numBits = 12) {
 function decodeBitsToInt(bitString, start, length) {
     const rval = parseInt(bitString.substr(start, length), 2);
     
-    utils.reveal(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
+    //utils.reveal(`decodeBitsToInt:${bitString} start:${start} length:${length} rval:${rval}`);
 
     return rval;
 }
@@ -141,8 +141,11 @@ function encodeFields({ input, fields }) {
 }
 
 function decodeField({ input, output, startPosition, field }) {
+
   const { type, numBits, decoder, validator, listCount } = field;
 
+  utils.reveal(utils.sprintf("type:%s numBits:%s decoder:%s validator:%s listCount:%s", type, numBits, decoder, validator, listCount))
+    
   if (typeof validator === 'function') {
     if (!validator(output)) {
       // Not decoding this field so make sure we start parsing the next field at
@@ -152,7 +155,9 @@ function decodeField({ input, output, startPosition, field }) {
   }
 
   if (typeof decoder === 'function') {
-    return decoder(input, output, startPosition);
+      var rval = decoder(input, output, startPosition);
+      utils.reveal("JS Decode:%s = %s", field.name, rval);
+      return rval
   }
 
   const bitCount = typeof numBits === 'function' ? numBits(output) : numBits;
