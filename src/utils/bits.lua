@@ -365,7 +365,7 @@ local function decodeFromBase64(consentString, definitionMap)
    
    -- Replace safe characters
    unsafe = unsafe:gsub('-', '+'):gsub('_', '/')
-   
+
    local bytes = base64.decode(unsafe)
    
    local inputBits = ''
@@ -374,6 +374,8 @@ local function decodeFromBase64(consentString, definitionMap)
       local bitString = utils.tostringbase(bytes:byte(i), 2)
       inputBits = inputBits .. padLeft(bitString, 8 - bitString:len())
    end
+   
+   utils.reveal("inputBits:"..inputBits)
    
    local rval = decodeConsentStringBitValue(inputBits, definitionMap)
 
@@ -392,7 +394,7 @@ local function decodeBitsToIds(bitString)
    local rval = {}
    bitString:gsub('.', function(c) table.insert(rval, c) end)
 
-   utils.reduce(function(acc, value, index, rval) 
+   utils.reduce(rval, function(acc, value, index, rval) 
 	 if value == '1' then
 	    if acc.indexOf(index + 1) == -1 then
 	       acc.push(index + 1)

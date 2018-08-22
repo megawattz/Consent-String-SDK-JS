@@ -63,7 +63,7 @@ function decodeConsentString(consentString)
 	 end
       end
    else 
-	 consentStringData.allowedVendorIds = decodeBitsToIds(vendorIdBitString);
+	 consentStringData.allowedVendorIds = bits.decodeBitsToIds(vendorIdBitString);
    end
    
    return consentStringData;

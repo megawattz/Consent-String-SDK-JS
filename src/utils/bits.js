@@ -322,6 +322,7 @@ function decodeFromBase64(consentString, definitionMap) {
 	inputBits += padLeft(bitString, 8 - bitString.length);
     }
 
+    utils.reveal("inputBits:"+inputBits)
     return decodeConsentStringBitValue(inputBits, definitionMap);
 }
 
