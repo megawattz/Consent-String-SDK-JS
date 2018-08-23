@@ -11,6 +11,8 @@ test.describe('decode', function ()
   test.it('decodes the consent data from a base64-encoded string', function () 
     local consentData = decodeConsentString('BOQ7WlgOQ7WlgABACDENABwAAABJOACgACAAQABA');
 
+    utils.reveal("consentData:"..utils.as_string(consentData))
+    
     test.assert([[consentData == {
       version = 1,
       cmpId = 1,

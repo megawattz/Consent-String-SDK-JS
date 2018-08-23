@@ -194,14 +194,14 @@ local function decodeField(in_out_start_field)
    local datatype, numBits, decoder, validator, listCount =
       field.datatype, field.numBits, field.decoder, field.validator, field.listCount
 
-   --utils.reveal(string.format("decodeField1:%s", utils.as_string(in_out_start_field)))
-   --utils.reveal(string.format("decodeField2: type:%s numBits:%s decoder:%s validator:%s listCount:%s", datatype, numBits, decoder, validator, listCount))
+   --utils.reveal(string.format("decodeField:%s", utils.as_string(in_out_start_field)))
+   utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s", field.name, datatype, numBits, decoder, validator, listCount))
 
-   
    if type(validator) == 'function' then
       if (not validator(output)) then
 	 -- Not decoding this field so make sure we start parsing the
 	 -- next field at the same point
+	 utils.reveal(string.format("%s validator={ newPosition: %s }", field.name, startPosition))
 	 return { newPosition = startPosition }
       end
    end
@@ -226,7 +226,7 @@ local function decodeField(in_out_start_field)
    end
 
    local switch_type = datatype
-   
+
    if switch_type == 'int' then
       return { fieldValue = decodeBitsToInt(input, startPosition, bitCount) }
    elseif switch_type == 'bool' then
@@ -238,6 +238,7 @@ local function decodeField(in_out_start_field)
    elseif switch_type == 'language' then
       return { fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) }
    elseif switch_type == 'list' then
+      utils.reveal("list not implemented")
       error("list type not implemented")
       --[[
 	 local rval = {}

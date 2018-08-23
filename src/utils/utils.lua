@@ -60,6 +60,12 @@ local function reveal(message, priority)
    print(string.format("%s\t%s", get_location(), message))
 end
 
+local function see(value)
+   if DebugLevel <= 5 then return end
+   print(as_string(value))
+   return value
+end
+
 -- convert data to string. If a table is passed, recurse down until
 -- all elements are stringable. How a complex structure is displayed
 -- is controlled by options, a table with values:
