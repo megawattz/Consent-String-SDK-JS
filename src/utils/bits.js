@@ -153,21 +153,19 @@ function decodeField({ input, output, startPosition, field }) {
 
     const { type, numBits, decoder, validator, listCount } = field;
 
-    utils.reveal(utils.sprintf("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s", field.name, type, numBits, decoder, validator, listCount))
+    utils.reveal(utils.sprintf("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startsPosition:%s input:%s", field.name, type, numBits, decoder, validator, listCount, startPosition, input.substr(startPosition, numBits)))
     
     if (typeof validator === 'function') {
 	if (!validator(output)) {
 	    // Not decoding this field so make sure we start parsing the next field at
 	    // the same point
-	    utils.reveal(utils.sprintf("%s validator={ newPosition: %s }", field.name, startPosition))
-	    return { newPosition: startPosition };
+	    return utils.see({ newPosition: startPosition });
 	}
     }
 
     if (typeof decoder === 'function') {
 	var rval = decoder(input, output, startPosition);
-	utils.reveal("JS Decode:%s = %s", field.name, rval);
-	return rval
+	return utils.see(rval)
     }
 
     const bitCount = typeof numBits === 'function' ? numBits(output) : numBits;
@@ -184,13 +182,13 @@ function decodeField({ input, output, startPosition, field }) {
     
     switch (type) {
     case 'int':
-	return { fieldValue: decodeBitsToInt(input, startPosition, bitCount) };
+	return utils.see({ fieldValue: decodeBitsToInt(input, startPosition, bitCount) })
     case 'bool':
-	return { fieldValue: decodeBitsToBool(input, startPosition) };
+	return utils.see({ fieldValue: decodeBitsToBool(input, startPosition) })
     case 'date':
-	return { fieldValue: decodeBitsToDate(input, startPosition, bitCount) };
+	return utils.see({ fieldValue: decodeBitsToDate(input, startPosition, bitCount) })
     case 'bits':
-	return { fieldValue: input.substr(startPosition, bitCount) };
+	return utils.see({ fieldValue: input.substr(startPosition, bitCount) })
     case 'list':
 	return new Array(listEntryCount).fill().reduce((acc) => {
             const { decodedObject, newPosition } = decodeFields({
@@ -198,13 +196,13 @@ function decodeField({ input, output, startPosition, field }) {
 		fields: field.fields,
 		startPosition: acc.newPosition,
             });
-            return {
+            return utils.see({
 		fieldValue: [...acc.fieldValue, decodedObject],
 		newPosition,
-            };
+            })
 	}, { fieldValue: [], newPosition: startPosition });
     case 'language':
-	return { fieldValue: decodeBitsToLanguage(input, startPosition, bitCount) };
+	return utils.see({ fieldValue: decodeBitsToLanguage(input, startPosition, bitCount) })
     default:
 	throw new Error(`ConsentString - Unknown field type ${type} for decoding`);
     }

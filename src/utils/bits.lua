@@ -91,7 +91,7 @@ local function decodeBitsToInt(bitString, start, length)
    length = length or 6
    local to_convert = bitString:sub(start, start + length - 1)
    local rval = tonumber(to_convert, 2)
-   utils.reveal(string.format("decodeBitsToInt:%s start:%s length:%s rval:%s", bitString, start, length, rval))
+   --utils.reveal(string.format("decodeBitsToInt:%s start:%s length:%s rval:%s", bitString, start, length, rval))
    return rval
 end
 
@@ -100,39 +100,33 @@ local function decodeBitsToDate(bitString, start, length)
 end
 
 local function decodeBitsToBool(bitString, start) 
-   return tonumber(bitString:sub(start, 1), 2) == 1
+   return tonumber(bitString:sub(start, start), 2) == 1
 end
 
 local function decodeBitsToLetter(bitString) 
    local letterCode = decodeBitsToInt(bitString)
-   utils.reveal(string.format("bitString:%s letterCode:%s", bitString, letterCode))
+   --utils.reveal(string.format("bitString:%s letterCode:%s", bitString, letterCode))
    return string.lower(string.char(letterCode + 65))
 end
 
 local function decodeBitsToLanguage(bitString, start, length)
-   utils.reveal(string.format("decodeBitsToLanguage: string:%s start:%s length:%s", bitString, start, length))
+   --utils.reveal(string.format("decodeBitsToLanguage: string:%s start:%s length:%s", bitString, start, length))
 
    local languageBitString = bitString:sub(start, start + length - 1)
    
-   utils.reveal("languageBitString:"..utils.vardata(languageBitString))
+   --utils.reveal("languageBitString:"..utils.vardata(languageBitString))
 
    length = length or 0
 
    local str1 = languageBitString:sub(1, length / 2)
    local str2 = languageBitString:sub(length / 2 + 1)
    
-   utils.reveal("str1:"..str1)
-   utils.reveal("str2:"..str2)
-
    local rval1 = decodeBitsToLetter(str1)
    local rval2 = decodeBitsToLetter(str2)
 
-   utils.reveal("language1:"..rval1)
-   utils.reveal("language2:"..rval2)
-   
    local rval = rval1..rval2
    
-   utils.reveal(string.format("decodeBitsToLanguage: %s", rval))
+   --utils.reveal(string.format("decodeBitsToLanguage: %s", rval))
    return rval
 end
 
@@ -165,7 +159,7 @@ local function encodeField(input_and_field)  -- { input, field }
    elseif field_type == case 'date' then
       return encodeDateToBits(fieldValue, bitCount)
    elseif field_type == 'bits' then
-      return padRight(fieldValue, bitCount - fieldValue.length):sub(1, bitCount)
+      return padRight(fieldValue, bitCount - fieldValue.length):sub(1, bitCount - 1)
    elseif field_type == 'list' then
       return fieldValue.utils.reduce(function(acc, listValue)
 	    acc = acc .. encodeFields({input = listValue, fields = field.fields })
@@ -194,22 +188,25 @@ local function decodeField(in_out_start_field)
    local datatype, numBits, decoder, validator, listCount =
       field.datatype, field.numBits, field.decoder, field.validator, field.listCount
 
-   --utils.reveal(string.format("decodeField:%s", utils.as_string(in_out_start_field)))
-   utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s", field.name, datatype, numBits, decoder, validator, listCount))
+   local bitCount = numBits
+   if type(numBits) == 'function' then
+      bitCount = numBits(output)
+   end
+
+   utils.reveal(string.format("decodeField:%s", utils.as_string(in_out_start_field)))
+   utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1)))
 
    if type(validator) == 'function' then
       if (not validator(output)) then
 	 -- Not decoding this field so make sure we start parsing the
 	 -- next field at the same point
-	 utils.reveal(string.format("%s validator={ newPosition: %s }", field.name, startPosition))
-	 return { newPosition = startPosition }
+	 return utils.see({ newPosition = startPosition })
       end
    end
    
    if type(decoder) == 'function' then
       local rval = decoder(input, output, startPosition)
-      utils.reveal("LUADecode:%s = %s", field.name, rval)
-      return rval
+      return utils.see(rval)
    end
    
    local bitCount = numBits
@@ -228,15 +225,15 @@ local function decodeField(in_out_start_field)
    local switch_type = datatype
 
    if switch_type == 'int' then
-      return { fieldValue = decodeBitsToInt(input, startPosition, bitCount) }
+      return utils.see({ fieldValue = decodeBitsToInt(input, startPosition, bitCount) })
    elseif switch_type == 'bool' then
-      return { fieldValue = decodeBitsToBool(input, startPosition) }
+      return utils.see({ fieldValue = decodeBitsToBool(input, startPosition) })
    elseif switch_type == 'date' then
-      return { fieldValue = decodeBitsToDate(input, startPosition, bitCount) }
+      return utils.see({ fieldValue = decodeBitsToDate(input, startPosition, bitCount) })
    elseif switch_type == 'bits' then
-      return { fieldValue = input:sub(startPosition, bitCount) }
+      return utils.see({ fieldValue = input:sub(startPosition, bitCount - 1) })
    elseif switch_type == 'language' then
-      return { fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) }
+      return utils.see({ fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) })
    elseif switch_type == 'list' then
       utils.reveal("list not implemented")
       error("list type not implemented")
@@ -270,6 +267,7 @@ local function decodeFields(input_fields_start)
 	       startPosition = position,
 	       field = field
 	 })
+	 
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
 	 
 	 if fieldValue then
@@ -323,7 +321,7 @@ local function encodeToBase64(data_definitionMap)
       -- Encode to bytes
       local bytes = ''
       for i = 1, paddedBinaryValue:len(), 8 do
-	 bytes = bytes .. String.char(tonumber(paddedBinaryValue:sub(i, 8), 2))
+	 bytes = bytes .. String.char(tonumber(paddedBinaryValue:sub(i, 8 - 1), 2))
       end
    end
 

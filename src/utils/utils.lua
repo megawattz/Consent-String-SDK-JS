@@ -60,12 +60,6 @@ local function reveal(message, priority)
    print(string.format("%s\t%s", get_location(), message))
 end
 
-local function see(value)
-   if DebugLevel <= 5 then return end
-   print(as_string(value))
-   return value
-end
-
 -- convert data to string. If a table is passed, recurse down until
 -- all elements are stringable. How a complex structure is displayed
 -- is controlled by options, a table with values:
@@ -107,6 +101,12 @@ local function as_string(value, options, level)
    return rval
 end
 
+local function see(value)
+   if DebugLevel < 5 then return value end
+   print(as_string(value))
+   return value
+end
+
 function vardata(variable)
    local rval = {
       ['type'] = type(variable),
@@ -123,6 +123,7 @@ return {
    reduce = reduce,
    vardata = vardata,
    find = fine,
+   see = see,
    reveal = reveal
 }
 
