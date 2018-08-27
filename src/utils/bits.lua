@@ -188,14 +188,18 @@ local function decodeField(in_out_start_field)
    local datatype, numBits, decoder, validator, listCount =
       field.datatype, field.numBits, field.decoder, field.validator, field.listCount
 
+   utils.reveal(string.format("field: %s", utils.as_string(field)))
+   utils.reveal(string.format("numBits: %s", numBits))
+   
    local bitCount = numBits
    if type(numBits) == 'function' then
       bitCount = numBits(output)
    end
 
    utils.reveal(string.format("decodeField:%s", utils.as_string(in_out_start_field)))
-   utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1)))
-
+   
+   --utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1)))
+   
    if type(validator) == 'function' then
       if (not validator(output)) then
 	 -- Not decoding this field so make sure we start parsing the
@@ -235,17 +239,20 @@ local function decodeField(in_out_start_field)
    elseif switch_type == 'language' then
       return utils.see({ fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) })
    elseif switch_type == 'list' then
-      utils.reveal("list not implemented")
-      error("list type not implemented")
-      --[[
-	 local rval = {}
-	 rval = utils.reduce(function(acc)
-	 local decodedObject, newPosition  = unpack decodeFields({input, fields: field.fields, startPosition: acc.newPosition})
-	 return {fieldValue: [...acc.fieldValue, decodedObject], newPosition, end
-	 end), { fieldValue: [], newPosition: startPosition })
-      --]]
-   else
-      error(string.format("ConsentString - Unknown field type:%s", switch_type))
+      local rval = {}
+      utils.reduce(rval,
+		   function(acc)
+		      local decoded = decodeFields({
+			    input = input,
+			    fields = field.fields,
+			    startPosition = acc.newPosition})
+		      return utils.see({
+			    fieldValue = {unpack(acc.fieldValue), decoded.decodedObject},
+			    newPosition = newPosition})
+      end)
+      return rval, { fieldValue = {}, newPosition = startPosition }
+else
+   error(string.format("ConsentString - Unknown field type:%s", switch_type))
    end
 end
 

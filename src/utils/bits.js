@@ -169,7 +169,7 @@ function decodeField({ input, output, startPosition, field }) {
     }
 
     const bitCount = typeof numBits === 'function' ? numBits(output) : numBits;
-
+    utils.reveal("numBits:"+numBits)
     
     let listEntryCount = 0;
     if (typeof listCount === 'function') {
