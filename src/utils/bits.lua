@@ -193,8 +193,8 @@ local function decodeField(in_out_start_field)
       bitCount = numBits(output)
    end
    
-   --utils.reveal(string.format("decodeField:%s", in_out_start_field.field.name))
-   --utils.reveal(utils.as_string(in_out_start_field))
+   utils.reveal(string.format("decodeField:%s", in_out_start_field.field.name))
+   utils.reveal(utils.as_string(in_out_start_field))
    --utils.reveal(string.format("field: %s", utils.as_string(field)))
    
    --utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1))) BitCount-1 causes a problem if BitCount is nil
@@ -248,7 +248,7 @@ local function decodeField(in_out_start_field)
 			    startPosition = acc.newPosition});
 		      local rval = {
 			 fieldValue = {unpack(acc.fieldValue), decoded.decodedObject},
-			 newPosition = newPosition
+			 newPosition = decoded.newPosition
 		      }
 		      --utils.reveal("reduceReturn:")
 		      return utils.see(rval)
@@ -269,20 +269,21 @@ function decodeFields(input_fields_start)
    -- utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
 
    local position = startPosition or 1
-   
+
    local decodedObject = utils.reduce(
       fields, function(acc, field)
 	 local name, numBits = field.name, field.numBits
+	 utils.reveal(string.format("acc1:%s %s", field.name, utils.as_string(field)))
 	 local decoded = decodeField({
 	       input = input,
 	       output = acc,
 	       startPosition = position,
 	       field = field
 	 })
-
+	 
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
 	 
-	 if fieldValue then
+	 if fieldValue ~= nil then
 	    acc[name] = fieldValue
 	 end
 	 
@@ -292,6 +293,7 @@ function decodeFields(input_fields_start)
 	    position = position + numBits
 	 end
 	 
+	 utils.reveal(string.format("acc2:%s %s", field.name, utils.as_string(acc)))
 	 return acc
 	      end, {})
    

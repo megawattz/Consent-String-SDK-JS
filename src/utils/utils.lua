@@ -16,14 +16,6 @@ local function find(t, item)
    return nil
 end
 
-local function reduce(t, func, start)
-   local acc = start or ''
-   for index, value in ipairs(t) do
-      acc = func(acc, value, index, t)
-   end
-   return acc
-end
-
 local function tostringbase(n, b)
    n = math.floor(n)
    b = b or 10
@@ -114,6 +106,14 @@ function vardata(variable)
       size = variable:len() or "n/a"
    }
    return as_string(rval)
+end
+
+local function reduce(t, func, start)
+   local acc = start or ''
+   for index, value in ipairs(t) do
+      acc = func(acc, value, index, t)
+   end
+   return acc
 end
 
 return {
