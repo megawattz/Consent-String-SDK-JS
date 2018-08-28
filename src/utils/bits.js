@@ -98,7 +98,7 @@ function decodeBitsToLanguage(bitString, start, length) {
 
     var rval = decodeBitsToLetter(str1)	+ decodeBitsToLetter(str2);
     
-    utils.reveal(utils.sprintf("decodeBitsToLanguage: %s", rval))
+    //utils.reveal(utils.sprintf("decodeBitsToLanguage: %s", rval))
 
     return rval
 }
@@ -153,7 +153,7 @@ function decodeField({ input, output, startPosition, field }) {
 
     const { type, numBits, decoder, validator, listCount } = field;
 
-    utils.reveal(utils.sprintf("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startsPosition:%s input:%s", field.name, type, numBits, decoder, validator, listCount, startPosition, input.substr(startPosition, numBits)))
+    //utils.reveal(utils.sprintf("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startsPosition:%s input:%s", field.name, type, numBits, decoder, validator, listCount, startPosition, input.substr(startPosition, numBits)))
     
     if (typeof validator === 'function') {
 	if (!validator(output)) {
@@ -169,7 +169,7 @@ function decodeField({ input, output, startPosition, field }) {
     }
 
     const bitCount = typeof numBits === 'function' ? numBits(output) : numBits;
-    utils.reveal("numBits:"+numBits)
+    //utils.reveal("numBits:"+numBits)
     
     let listEntryCount = 0;
     if (typeof listCount === 'function') {
@@ -180,6 +180,10 @@ function decodeField({ input, output, startPosition, field }) {
 
     //utils.reveal(utils.sprintf("decodeField2 input:%s startPosition:%s bitCount:%s", input, startPosition, bitCount))
     
+    //utils.reveal(utils.sprintf("decodeField:%s", field.name))
+    //utils.reveal(utils.as_string({ input, output, startPosition, field }))
+    //utils.reveal(utils.sprintf("field: %s", utils.as_string(field)))
+
     switch (type) {
     case 'int':
 	return utils.see({ fieldValue: decodeBitsToInt(input, startPosition, bitCount) })
@@ -190,17 +194,20 @@ function decodeField({ input, output, startPosition, field }) {
     case 'bits':
 	return utils.see({ fieldValue: input.substr(startPosition, bitCount) })
     case 'list':
-	return new Array(listEntryCount).fill().reduce((acc) => {
+	const rval = new Array(listEntryCount).fill().reduce((acc) => {
             const { decodedObject, newPosition } = decodeFields({
 		input,
 		fields: field.fields,
 		startPosition: acc.newPosition,
             });
+	    //utils.reveal("reduceReturn:")
             return utils.see({
 		fieldValue: [...acc.fieldValue, decodedObject],
 		newPosition,
             })
-	}, { fieldValue: [], newPosition: startPosition });
+	}, {fieldValue: [], newPosition: startPosition })
+	//utils.reveal("decodedList:")
+	return utils.see(rval)
     case 'language':
 	return utils.see({ fieldValue: decodeBitsToLanguage(input, startPosition, bitCount) })
     default:
@@ -219,7 +226,7 @@ function decodeFields({ input, fields, startPosition = 0 }) {
 	    startPosition: position,
 	    field,
 	});
-
+	
 	if (fieldValue !== undefined) {
 	    acc[name] = fieldValue;
 	}
@@ -232,6 +239,11 @@ function decodeFields({ input, fields, startPosition = 0 }) {
 
 	return acc;
     }, {});
+    
+    utils.reveal("decodedObject:"+utils.as_string({
+	decodedObject,
+	newPosition: position,
+    }))
 
     return {
 	decodedObject,
@@ -321,12 +333,12 @@ function decodeFromBase64(consentString, definitionMap) {
 	inputBits += padLeft(bitString, 8 - bitString.length);
     }
 
-    utils.reveal("inputBits:"+inputBits)
+    //utils.reveal("inputBits:"+inputBits)
     return decodeConsentStringBitValue(inputBits, definitionMap);
 }
 
 function decodeBitsToIds(bitString) {
-    utils.reveal("decodeBitsToIds:"+bitString)
+    //utils.reveal("decodeBitsToIds:"+bitString)
     return bitString.split('').reduce((acc, bit, index) => {
 	if (bit === '1') {
 	    if (acc.indexOf(index + 1) === -1) {

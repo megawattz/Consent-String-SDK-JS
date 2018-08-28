@@ -187,18 +187,17 @@ local function decodeField(in_out_start_field)
    
    local datatype, numBits, decoder, validator, listCount =
       field.datatype, field.numBits, field.decoder, field.validator, field.listCount
-
-   utils.reveal(string.format("field: %s", utils.as_string(field)))
-   utils.reveal(string.format("numBits: %s", numBits))
    
    local bitCount = numBits
    if type(numBits) == 'function' then
       bitCount = numBits(output)
    end
-
-   utils.reveal(string.format("decodeField:%s", utils.as_string(in_out_start_field)))
    
-   --utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1)))
+   --utils.reveal(string.format("decodeField:%s", in_out_start_field.field.name))
+   --utils.reveal(utils.as_string(in_out_start_field))
+   --utils.reveal(string.format("field: %s", utils.as_string(field)))
+   
+   --utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1))) BitCount-1 causes a problem if BitCount is nil
    
    if type(validator) == 'function' then
       if (not validator(output)) then
@@ -240,23 +239,29 @@ local function decodeField(in_out_start_field)
       return utils.see({ fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) })
    elseif switch_type == 'list' then
       local rval = {}
+      for i = 1, listEntryCount do table.insert(rval, '') end
       utils.reduce(rval,
 		   function(acc)
 		      local decoded = decodeFields({
 			    input = input,
 			    fields = field.fields,
-			    startPosition = acc.newPosition})
-		      return utils.see({
-			    fieldValue = {unpack(acc.fieldValue), decoded.decodedObject},
-			    newPosition = newPosition})
-      end)
-      return rval, { fieldValue = {}, newPosition = startPosition }
-else
-   error(string.format("ConsentString - Unknown field type:%s", switch_type))
+			    startPosition = acc.newPosition});
+		      local rval = {
+			 fieldValue = {unpack(acc.fieldValue), decoded.decodedObject},
+			 newPosition = newPosition
+		      }
+		      --utils.reveal("reduceReturn:")
+		      return utils.see(rval)
+		   end,
+		   { fieldValue = {}, newPosition = startPosition })
+      --utils.reveal("decodedList:")
+      return utils.see(rval)
+   else
+      error(string.format("ConsentString - Unknown field type:%s", switch_type))
    end
 end
 
-local function decodeFields(input_fields_start)
+function decodeFields(input_fields_start)
    -- utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
    
    local input, fields, startPosition = input_fields_start.input, input_fields_start.fields, input_fields_start.startPosition or 1;
@@ -274,7 +279,7 @@ local function decodeFields(input_fields_start)
 	       startPosition = position,
 	       field = field
 	 })
-	 
+
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
 	 
 	 if fieldValue then
@@ -290,7 +295,9 @@ local function decodeFields(input_fields_start)
 	 return acc
 	      end, {})
    
-   return { decodedObject, newPosition = position }
+   utils.reveal("decodedObject:"..utils.as_string({ decodedObject = decodedObject, newPosition = position}))
+   
+   return { decodedObject = decodedObject, newPosition = position }
 end
 
 --[[*
@@ -381,7 +388,7 @@ local function decodeFromBase64(consentString, definitionMap)
       inputBits = inputBits .. padLeft(bitString, 8 - bitString:len())
    end
    
-   utils.reveal("inputBits:"..inputBits)
+   --utils.reveal("inputBits:"..inputBits)
    
    local rval = decodeConsentStringBitValue(inputBits, definitionMap)
 
@@ -396,7 +403,7 @@ end
 
 local function decodeBitsToIds(bitString)
    bitString = bitString or ""
-   utils.reveal("decodeBitsToIds:"..bitString)
+   --utils.reveal("decodeBitsToIds:"..bitString)
    local rval = {}
    bitString:gsub('.', function(c) table.insert(rval, c) end)
 
