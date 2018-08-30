@@ -7,7 +7,7 @@ local utils = require('utils')
     * @param {string} consentString
     --]]
 function decodeConsentString(consentString)
-   local
+   --[[ local
       version,
    cmpId,
    vendorListVersion,
@@ -21,11 +21,12 @@ function decodeConsentString(consentString)
    vendorRangeList,
    cmpVersion,
    consentScreen,
-   consentLanguage
-      = bits.decodeFromBase64(consentString);
+   consentLanguage 
+      --]]
+   local stuff = { bits.decodeFromBase64(consentString) };
 
    utils.reveal("consentString:"..consentString)
-   utils.reveal("purposeIdBitString:"..purposeIdBitString)
+   utils.reveal("purposeIdBitString:"..utils.as_string(stuff))
    
    local consentStringData = {
       version = version,
@@ -66,6 +67,8 @@ function decodeConsentString(consentString)
    else 
       consentStringData.allowedVendorIds = bits.decodeBitsToIds(vendorIdBitString);
    end
+
+   utils.reveal(string.format("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
    
    return consentStringData;
 end

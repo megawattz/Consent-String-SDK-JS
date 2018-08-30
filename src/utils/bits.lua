@@ -193,8 +193,8 @@ local function decodeField(in_out_start_field)
       bitCount = numBits(output)
    end
    
-   utils.reveal(string.format("decodeField:%s", in_out_start_field.field.name))
-   utils.reveal(utils.as_string(in_out_start_field))
+   --utils.reveal(string.format("decodeField:%s", in_out_start_field.field.name))
+   --utils.reveal(utils.as_string(in_out_start_field))
    --utils.reveal(string.format("field: %s", utils.as_string(field)))
    
    --utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1))) BitCount-1 causes a problem if BitCount is nil
@@ -234,7 +234,7 @@ local function decodeField(in_out_start_field)
    elseif switch_type == 'date' then
       return utils.see({ fieldValue = decodeBitsToDate(input, startPosition, bitCount) })
    elseif switch_type == 'bits' then
-      return utils.see({ fieldValue = input:sub(startPosition, bitCount - 1) })
+      return utils.see({ fieldValue = input:sub(startPosition, startPosition + bitCount - 1) })
    elseif switch_type == 'language' then
       return utils.see({ fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) })
    elseif switch_type == 'list' then
@@ -273,7 +273,7 @@ function decodeFields(input_fields_start)
    local decodedObject = utils.reduce(
       fields, function(acc, field)
 	 local name, numBits = field.name, field.numBits
-	 utils.reveal(string.format("acc1:%s %s", field.name, utils.as_string(field)))
+	 --utils.reveal(string.format("acc1:%s %s", field.name, utils.as_string(field)))
 	 local decoded = decodeField({
 	       input = input,
 	       output = acc,
@@ -293,11 +293,11 @@ function decodeFields(input_fields_start)
 	    position = position + numBits
 	 end
 	 
-	 utils.reveal(string.format("acc2:%s %s", field.name, utils.as_string(acc)))
+	 --utils.reveal(string.format("acc2:%s %s", field.name, utils.as_string(acc)))
 	 return acc
 	      end, {})
    
-   utils.reveal("decodedObject:"..utils.as_string({ decodedObject = decodedObject, newPosition = position}))
+   --utils.reveal("decodedObject:"..utils.as_string({ decodedObject = decodedObject, newPosition = position}))
    
    return { decodedObject = decodedObject, newPosition = position }
 end

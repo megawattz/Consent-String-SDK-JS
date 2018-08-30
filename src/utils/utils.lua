@@ -108,6 +108,10 @@ function vardata(variable)
    return as_string(rval)
 end
 
+local function sprintf(fmt, ...)
+   return string.format(fmt, unpack(arg))
+end
+
 local function reduce(t, func, start)
    local acc = start or ''
    for index, value in ipairs(t) do
@@ -124,6 +128,7 @@ return {
    vardata = vardata,
    find = fine,
    see = see,
+   sprintf = sprintf,
    reveal = reveal
 }
 

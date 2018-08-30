@@ -180,8 +180,8 @@ function decodeField({ input, output, startPosition, field }) {
 
     //utils.reveal(utils.sprintf("decodeField2 input:%s startPosition:%s bitCount:%s", input, startPosition, bitCount))
     
-    utils.reveal(utils.sprintf("decodeField:%s", field.name))
-    utils.reveal(utils.as_string({ input, output, startPosition, field }))
+    //utils.reveal(utils.sprintf("decodeField:%s", field.name))
+    //utils.reveal(utils.as_string({ input, output, startPosition, field }))
     //utils.reveal(utils.sprintf("field: %s", utils.as_string(field)))
 
     switch (type) {
@@ -220,7 +220,7 @@ function decodeFields({ input, fields, startPosition = 0 }) {
 
     const decodedObject = fields.reduce((acc, field) => {
 	const { name, numBits } = field;
-	utils.reveal(utils.sprintf("acc1:%s %s", field.name, utils.as_string(field)))
+	//utils.reveal(utils.sprintf("acc1:%s %s", field.name, utils.as_string(field)))
 	const { fieldValue, newPosition } = decodeField({
 	    input,
 	    output: acc,
@@ -238,14 +238,11 @@ function decodeFields({ input, fields, startPosition = 0 }) {
 	    position += numBits;
 	}
 
-	utils.reveal(utils.sprintf("acc2:%s %s", field.name, utils.as_string(acc)))
+	//utils.reveal(utils.sprintf("acc2:%s %s", field.name, utils.as_string(acc)))
 	return acc;
     }, {});
     
-    utils.reveal("decodedObject:"+utils.as_string({
-	decodedObject,
-	newPosition: position,
-    }))
+    //utils.reveal("decodedObject:"+utils.as_string({decodedObject,newPosition: position}))
 
     return {
 	decodedObject,

@@ -3,6 +3,8 @@ const {
   decodeFromBase64,
 } = require('./utils/bits');
 
+const utils = require('./utils/utils')
+
 /**
  * Decode consent data from a web-safe base64-encoded string
  *
@@ -26,7 +28,11 @@ function decodeConsentString(consentString) {
     consentLanguage,
   } = decodeFromBase64(consentString);
 
-  const consentStringData = {
+    const stuff = decodeFromBase64(consentString);
+    utils.reveal("consentString:"+consentString)
+    utils.reveal("purposeIdBitString:"+utils.as_string(stuff))
+    
+    const consentStringData = {
     version,
     cmpId,
     vendorListVersion,
@@ -67,6 +73,8 @@ function decodeConsentString(consentString) {
     consentStringData.allowedVendorIds = decodeBitsToIds(vendorIdBitString);
   }
 
+    utils.reveal(utils.sprintf("%s=%s", consentString, utils.as_string(consentStringData)))
+    
   return consentStringData;
 }
 
