@@ -200,13 +200,12 @@ function decodeField({ input, output, startPosition, field }) {
 		fields: field.fields,
 		startPosition: acc.newPosition,
             });
-	    //utils.reveal("reduceReturn:")
-            return utils.see({
+            return {
 		fieldValue: [...acc.fieldValue, decodedObject],
 		newPosition,
-            })
+            }
 	}, {fieldValue: [], newPosition: startPosition })
-	//utils.reveal("decodedList:")
+	utils.reveal(utils.sprintf("rval: %s=%s", field.name, utils.as_string(rval)))
 	return utils.see(rval)
     case 'language':
 	return utils.see({ fieldValue: decodeBitsToLanguage(input, startPosition, bitCount) })
@@ -218,15 +217,19 @@ function decodeField({ input, output, startPosition, field }) {
 function decodeFields({ input, fields, startPosition = 0 }) {
     let position = startPosition;
 
+   //utils.reveal(utils.sprintf("decodeFields:%s", utils.as_string(fields)))
     const decodedObject = fields.reduce((acc, field) => {
 	const { name, numBits } = field;
 	//utils.reveal(utils.sprintf("acc1:%s %s", field.name, utils.as_string(field)))
-	const { fieldValue, newPosition } = decodeField({
+	const decode = {
 	    input,
 	    output: acc,
 	    startPosition: position,
 	    field,
-	});
+	};
+	const { fieldValue, newPosition } = decodeField(decode)
+	//utils.reveal(utils.sprintf("decode:%s fieldValue:%s newPosition:%s",
+				   //utils.as_string(decode), utils.as_string(fieldValue), newPosition))
 	
 	if (fieldValue !== undefined) {
 	    acc[name] = fieldValue;
@@ -242,7 +245,7 @@ function decodeFields({ input, fields, startPosition = 0 }) {
 	return acc;
     }, {});
     
-    //utils.reveal("decodedObject:"+utils.as_string({decodedObject,newPosition: position}))
+    //utils.reveal("DecodeFields:"+utils.as_string(decodedObject))
 
     return {
 	decodedObject,
@@ -306,6 +309,7 @@ function decodeConsentStringBitValue(bitString, definitionMap = vendorVersionMap
     const fields = definitionMap[version].fields;
     const { decodedObject } = decodeFields({ input: bitString, fields });
 
+   //utils.reveal("DecodedObject:"+utils.as_string(decodedObject))
     return decodedObject;
 }
 

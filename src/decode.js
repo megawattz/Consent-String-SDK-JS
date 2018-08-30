@@ -29,8 +29,8 @@ function decodeConsentString(consentString) {
   } = decodeFromBase64(consentString);
 
     const stuff = decodeFromBase64(consentString);
-    utils.reveal("consentString:"+consentString)
-    utils.reveal("purposeIdBitString:"+utils.as_string(stuff))
+    //utils.reveal("consentString:"+consentString)
+    //utils.reveal("purposeIdBitString:"+utils.as_string(stuff))
     
     const consentStringData = {
     version,
@@ -45,8 +45,10 @@ function decodeConsentString(consentString) {
     consentLanguage,
   };
 
-  if (isRange) {
-    /* eslint no-shadow: off */
+    //utils.reveal("vendorRangeList:"+utils.as_string(vendorRangeList))
+    
+    if (isRange) {
+	/* eslint no-shadow: off */
     const idMap = vendorRangeList.reduce((acc, { isRange, startVendorId, endVendorId }) => {
       const lastVendorId = isRange ? endVendorId : startVendorId;
 
@@ -73,7 +75,7 @@ function decodeConsentString(consentString) {
     consentStringData.allowedVendorIds = decodeBitsToIds(vendorIdBitString);
   }
 
-    utils.reveal(utils.sprintf("%s=%s", consentString, utils.as_string(consentStringData)))
+    //utils.reveal(utils.sprintf("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
     
   return consentStringData;
 }

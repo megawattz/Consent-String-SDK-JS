@@ -242,19 +242,22 @@ local function decodeField(in_out_start_field)
       for i = 1, listEntryCount do table.insert(rval, '') end
       utils.reduce(rval,
 		   function(acc)
+		      --utils.reveal("acc:"..utils.as_string(acc))
 		      local decoded = decodeFields({
 			    input = input,
 			    fields = field.fields,
 			    startPosition = acc.newPosition});
+		      --utils.reveal("decoded:"..utils.as_string(decoded))
+		      table.insert(acc.fieldValue, decoded.decodedObject)
 		      local rval = {
-			 fieldValue = {unpack(acc.fieldValue), decoded.decodedObject},
+			 fieldValue = acc.fieldValue,
 			 newPosition = decoded.newPosition
 		      }
-		      --utils.reveal("reduceReturn:")
-		      return utils.see(rval)
+		      utils.reveal(string.format("rval: %s=%s", field.name,utils.as_string(rval)))
+		      return rval
 		   end,
 		   { fieldValue = {}, newPosition = startPosition })
-      --utils.reveal("decodedList:")
+      --utils.reveal("decodedList:"..utils.as_string(rval))
       return utils.see(rval)
    else
       error(string.format("ConsentString - Unknown field type:%s", switch_type))
@@ -270,18 +273,22 @@ function decodeFields(input_fields_start)
 
    local position = startPosition or 1
 
+   -- utils.reveal(string.format("decodeField:%s", utils.as_string(fields)))
    local decodedObject = utils.reduce(
       fields, function(acc, field)
 	 local name, numBits = field.name, field.numBits
 	 --utils.reveal(string.format("acc1:%s %s", field.name, utils.as_string(field)))
-	 local decoded = decodeField({
+	 local decode = {
 	       input = input,
 	       output = acc,
 	       startPosition = position,
 	       field = field
-	 })
-	 
+	 }
+	 local decoded = decodeField(decode)
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
+
+	 --utils.reveal(string.format("decode:%s fieldValue:%s newPosition:%s",
+	 --utils.as_string(decode), utils.as_string(fieldValue), newPosition))
 	 
 	 if fieldValue ~= nil then
 	    acc[name] = fieldValue
@@ -297,7 +304,7 @@ function decodeFields(input_fields_start)
 	 return acc
 	      end, {})
    
-   --utils.reveal("decodedObject:"..utils.as_string({ decodedObject = decodedObject, newPosition = position}))
+   --utils.reveal("DecodeFields:"..utils.as_string(decodedObject))
    
    return { decodedObject = decodedObject, newPosition = position }
 end
@@ -364,7 +371,9 @@ local function decodeConsentStringBitValue(bitString, definitionMap)
 
    local fields = definitionMap[version].fields
    local decodedObject = decodeFields({ input = bitString, fields = fields})
-   
+
+   --utils.reveal("DecodedObject:"..utils.as_string(decodedObject))
+
    return decodedObject
 end
 

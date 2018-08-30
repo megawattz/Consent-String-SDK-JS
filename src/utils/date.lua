@@ -6,7 +6,7 @@ local time_keys = {Y = "year", M = "month", D = "day", h = "hour", m = "min", s 
 local function from_date(datestring, order) -- order is a table with elements defined, defalt YMDhms (Year, Month, Day, Hours, Minutes, Seconds)
    local now = os.date("*t") -- used for defaults (missing elements) if necessary
    local elements = {datestring:match("(%d*)%D*(%d*)%D*(%d*)%D*(%d*)%D*(%d*)%D*(%d*)")}
-   utils.reveal("elements:"..table.concat(elements, " "))
+   --utils.reveal("elements:"..table.concat(elements, " "))
    order = order or "YMDhms" -- set how we will interpret those numbers, their order
    local new_time = {}
    for i = 1, #order, 1 do
@@ -45,9 +45,6 @@ local function Date(initializer, order) -- order is the order the time elements 
    
    return self
 end
-
---local x = Date(os.time())
---print("DATE:"..tostring(x))
 
 return {
    new = Date

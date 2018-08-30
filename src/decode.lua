@@ -7,7 +7,7 @@ local utils = require('utils')
     * @param {string} consentString
     --]]
 function decodeConsentString(consentString)
-   --[[ local
+   local
       version,
    cmpId,
    vendorListVersion,
@@ -21,12 +21,11 @@ function decodeConsentString(consentString)
    vendorRangeList,
    cmpVersion,
    consentScreen,
-   consentLanguage 
-      --]]
-   local stuff = { bits.decodeFromBase64(consentString) };
+   consentLanguage = bits.decodeFromBase64(consentString)
 
-   utils.reveal("consentString:"..consentString)
-   utils.reveal("purposeIdBitString:"..utils.as_string(stuff))
+   local stuff = { bits.decodeFromBase64(consentString) };
+   --utils.reveal("consentString:"..consentString)
+   --utils.reveal("purposeIdBitString:"..purposeIdBitString)
    
    local consentStringData = {
       version = version,
@@ -41,7 +40,9 @@ function decodeConsentString(consentString)
       consentLanguage = consentLanguage,
    };
    
-   utils.reveal("lua decodeFromBase64:"..utils.as_string(consentStringData));
+   --utils.reveal("lua decodeFromBase64:"..utils.as_string(consentStringData));
+
+   --utils.reveal("vendorRangeList:"..utils.as_string(vendorRangeList))
    
    if isRange then
       local idMap = bits.reduce(vendorRangeList, function(acc, isrange_startvendorid_endvendorid)
