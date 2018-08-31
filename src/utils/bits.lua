@@ -306,7 +306,10 @@ function decodeFields(input_fields_start)
    
    --utils.reveal("DecodeFields:"..utils.as_string(decodedObject))
    
-   return { decodedObject = decodedObject, newPosition = position }
+   return {
+      decodedObject = decodedObject,
+      newPosition = position
+   }
 end
 
 --[[*
@@ -370,11 +373,11 @@ local function decodeConsentStringBitValue(bitString, definitionMap)
    end
 
    local fields = definitionMap[version].fields
-   local decodedObject = decodeFields({ input = bitString, fields = fields})
+   local rval = decodeFields({ input = bitString, fields = fields})
 
-   --utils.reveal("DecodedObject:"..utils.as_string(decodedObject))
+   --utils.reveal("DecodedObject:"..utils.as_string(rval))
 
-   return decodedObject
+   return rval.decodedObject
 end
 
 --[[*
@@ -399,10 +402,8 @@ local function decodeFromBase64(consentString, definitionMap)
       inputBits = inputBits .. padLeft(bitString, 8 - bitString:len())
    end
    
-   --utils.reveal("inputBits:"..inputBits)
-   
    local rval = decodeConsentStringBitValue(inputBits, definitionMap)
-
+   --utils.reveal("decodeFromBase64:"..utils.as_string(rval))
    return rval
 end
 

@@ -338,7 +338,9 @@ function decodeFromBase64(consentString, definitionMap) {
     }
 
     //utils.reveal("inputBits:"+inputBits)
-    return decodeConsentStringBitValue(inputBits, definitionMap);
+    const rval = decodeConsentStringBitValue(inputBits, definitionMap);
+    //utils.reveal("decodeFromBase64:"+utils.as_string(rval))
+    return rval
 }
 
 function decodeBitsToIds(bitString) {

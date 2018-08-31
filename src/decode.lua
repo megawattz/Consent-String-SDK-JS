@@ -23,30 +23,33 @@ function decodeConsentString(consentString)
    defaultConsent,
    consentLanguage = bits.decodeFromBase64(consentString)
    
-   local stuff = { bits.decodeFromBase64(consentString) };
-   utils.reveal("consentStringDecoded-1:"..utils.as_string(stuff))
-   --utils.reveal("purposeIdBitString:"..purposeIdBitString)
-   
-   local consentStringData = {
-      version = version,
-      cmpId = cmpId,
-      vendorListVersion = vendorListVersion,
-      allowedPurposeIds = bits.decodeBitsToIds(purposeIdBitString),
-      maxVendorId = maxVendorId,
-      created = created,
-      lastUpdated = lastUpdated,
-      cmpVersion = cmpVersion,
-      consentScreen = consentScreen,
-      consentLanguage = consentLanguage,
-   };
+   local decoded = bits.decodeFromBase64(consentString);
+   utils.reveal("consentStringDecoded:"..utils.as_string(decoded))
    
    --utils.reveal("from list consentStringData-2:"..utils.as_string(consentStringData));
 
    --utils.reveal("vendorRangeList:"..utils.as_string(vendorRangeList))
    
-   if isRange then
-      local idMap = bits.reduce(vendorRangeList, function(acc, isrange_startvendorid_endvendorid)
-				   local isRange, startVendorId, endVendorId = unpack(isrange_startvendorid_endvendorid)
+   local consentStringData = {
+      version = decoded.version,
+      cmpId = decoded.cmpId,
+      vendorListVersion = decoded.vendorListVersion,
+      allowedPurposeIds = bits.decodeBitsToIds(purposeIdBitString),
+      maxVendorId = decoded.maxVendorId,
+      created = decoded.created,
+      lastUpdated = decoded.lastUpdated,
+      cmpVersion = decoded.cmpVersion,
+      consentScreen = decoded.consentScreen,
+      consentLanguage = decoded.consentLanguage,
+   };
+   
+   utils.reveal("isRange:"..utils.as_string(decoded.isRange))
+   
+   if decoded.isRange then
+      local idMap = bits.reduce(decoded.vendorRangeList, function(acc, ise)
+				   local isRange, startVendorId, endVendorId =
+				      ise.isRange, ise.endVendorId, ise.startVendorId
+				   
 				   local lastVendorId = utils.iftrue(isRange, endVendorId, startVendorId)
 				   
 				   for i = startVendorId, lastVendorId, 1 do
@@ -57,6 +60,8 @@ function decodeConsentString(consentString)
 						 end, {});
       
       consentStringData.allowedVendorIds = {};
+
+      utils.reveal("idMap:"..utils.as_string(idMap))
       
       for i = 1, maxVendorId, 1 do
 	 if (defaultConsent and not idMap[i]) or (not defaultConsent and idMap[i]) then
