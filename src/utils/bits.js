@@ -205,7 +205,8 @@ function decodeField({ input, output, startPosition, field }) {
 		newPosition,
             }
 	}, {fieldValue: [], newPosition: startPosition })
-	utils.reveal(utils.sprintf("rval: %s=%s", field.name, utils.as_string(rval)))
+
+	// utils.reveal(utils.sprintf("rval: %s=%s", field.name, utils.as_string(rval)))
 	return utils.see(rval)
     case 'language':
 	return utils.see({ fieldValue: decodeBitsToLanguage(input, startPosition, bitCount) })

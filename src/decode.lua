@@ -24,7 +24,7 @@ function decodeConsentString(consentString)
    consentLanguage = bits.decodeFromBase64(consentString)
    
    local stuff = { bits.decodeFromBase64(consentString) };
-   utils.reveal("into object consentStringData-1:"..utils.as_string(stuff))
+   utils.reveal("consentStringDecoded-1:"..utils.as_string(stuff))
    --utils.reveal("purposeIdBitString:"..purposeIdBitString)
    
    local consentStringData = {
@@ -40,7 +40,7 @@ function decodeConsentString(consentString)
       consentLanguage = consentLanguage,
    };
    
-   utils.reveal("from list consentStringData-2:"..utils.as_string(consentStringData));
+   --utils.reveal("from list consentStringData-2:"..utils.as_string(consentStringData));
 
    --utils.reveal("vendorRangeList:"..utils.as_string(vendorRangeList))
    
@@ -69,7 +69,7 @@ function decodeConsentString(consentString)
       consentStringData.allowedVendorIds = bits.decodeBitsToIds(vendorIdBitString);
    end
 
-   utils.reveal(string.format("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
+   --utils.reveal(string.format("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
    
    return consentStringData;
 end

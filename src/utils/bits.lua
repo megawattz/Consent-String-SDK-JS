@@ -238,11 +238,11 @@ local function decodeField(in_out_start_field)
    elseif switch_type == 'language' then
       return utils.see({ fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) })
    elseif switch_type == 'list' then
-      local rval = {}
-      for i = 1, listEntryCount do table.insert(rval, '') end
-      utils.reduce(rval,
+      local looper = {}
+      for i = 1, listEntryCount do table.insert(looper, '') end
+      local rval = utils.reduce(looper,
 		   function(acc)
-		      --utils.reveal("acc:"..utils.as_string(acc))
+		      -- utils.reveal("in acc:"..utils.as_string(acc))
 		      local decoded = decodeFields({
 			    input = input,
 			    fields = field.fields,
@@ -253,11 +253,11 @@ local function decodeField(in_out_start_field)
 			 fieldValue = acc.fieldValue,
 			 newPosition = decoded.newPosition
 		      }
-		      utils.reveal(string.format("rval: %s=%s", field.name,utils.as_string(rval)))
+		      -- utils.reveal(string.format("out acc: %s=%s", field.name,utils.as_string(rval)))
 		      return rval
 		   end,
 		   { fieldValue = {}, newPosition = startPosition })
-      --utils.reveal("decodedList:"..utils.as_string(rval))
+      -- utils.reveal("decodedList:"..utils.as_string(rval))
       return utils.see(rval)
    else
       error(string.format("ConsentString - Unknown field type:%s", switch_type))

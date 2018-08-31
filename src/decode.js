@@ -29,7 +29,7 @@ function decodeConsentString(consentString) {
   } = decodeFromBase64(consentString);
 
     const stuff = decodeFromBase64(consentString);
-    //utils.reveal("consentString:"+consentString)
+    utils.reveal("consentStringDecoded-1:"+utils.as_string(stuff))
     //utils.reveal("purposeIdBitString:"+utils.as_string(stuff))
     
     const consentStringData = {
@@ -75,7 +75,7 @@ function decodeConsentString(consentString) {
       consentStringData.allowedVendorIds = decodeBitsToIds(vendorIdBitString);
   }
     
-    utils.reveal(utils.sprintf("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
+    //utils.reveal(utils.sprintf("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
     
   return consentStringData;
 }
