@@ -9,6 +9,10 @@ local utils = require('utils')
 function decodeConsentString(consentString)
    local
       version,
+   vendorIdBitString,
+   vendorRangeList,
+   cmpVersion,
+   consentScreen,
    cmpId,
    vendorListVersion,
    purposeIdBitString,
@@ -17,14 +21,10 @@ function decodeConsentString(consentString)
    lastUpdated,
    isRange,
    defaultConsent,
-   vendorIdBitString,
-   vendorRangeList,
-   cmpVersion,
-   consentScreen,
    consentLanguage = bits.decodeFromBase64(consentString)
-
+   
    local stuff = { bits.decodeFromBase64(consentString) };
-   --utils.reveal("consentString:"..consentString)
+   utils.reveal("into object consentStringData-1:"..utils.as_string(stuff))
    --utils.reveal("purposeIdBitString:"..purposeIdBitString)
    
    local consentStringData = {
@@ -40,7 +40,7 @@ function decodeConsentString(consentString)
       consentLanguage = consentLanguage,
    };
    
-   --utils.reveal("lua decodeFromBase64:"..utils.as_string(consentStringData));
+   utils.reveal("from list consentStringData-2:"..utils.as_string(consentStringData));
 
    --utils.reveal("vendorRangeList:"..utils.as_string(vendorRangeList))
    
