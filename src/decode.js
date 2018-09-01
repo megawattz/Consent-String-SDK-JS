@@ -77,7 +77,7 @@ function decodeConsentString(consentString) {
 	consentStringData.allowedVendorIds = decodeBitsToIds(vendorIdBitString);
     }
     
-    //utils.reveal(utils.sprintf("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
+    utils.reveal(utils.sprintf("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
     
     return consentStringData;
 }
