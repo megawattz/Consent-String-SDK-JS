@@ -28,8 +28,8 @@ function decodeConsentString(consentString) {
 	consentLanguage,
     } = decodeFromBase64(consentString);
 
-    const stuff = decodeFromBase64(consentString);
-    utils.reveal("consentStringDecoded-1:"+utils.as_string(stuff))
+    //const stuff = decodeFromBase64(consentString);
+    //utils.reveal("consentStringDecoded-1:"+utils.as_string(stuff))
     // utils.reveal("purposeIdBitString:"+utils.as_string(stuff))
     
     const consentStringData = {
@@ -61,7 +61,7 @@ function decodeConsentString(consentString) {
 	
 	consentStringData.allowedVendorIds = [];
 	
-	utils.reveal("idMap:"+utils.as_string(idMap))
+	//utils.reveal("idMap:"+utils.as_string(idMap))
 	
 	for (let i = 1; i <= maxVendorId; i += 1) {
 	    if (

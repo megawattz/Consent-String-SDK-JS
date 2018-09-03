@@ -13,21 +13,22 @@ test.describe('decode', function ()
 
     utils.reveal("consentData:"..utils.as_string(consentData))
     
-    test.assert([[consentData == {
-      version = 1,
-      cmpId = 1,
-      cmpVersion = 2,
-      consentScreen = 3,
-      consentLanguage = 'en',
-      vendorListVersion = 1,
-      maxVendorId = 1171,
-      created = aDate,
-      lastUpdated = aDate,
-      allowedPurposeIds = {1, 2},
-      allowedVendorIds = {1, 2, 4},
-    }]]);
+    test.assert("true", consentData == {
+		   version = 1,
+		   cmpId = 1,
+		   cmpVersion = 2,
+		   consentScreen = 3,
+		   consentLanguage = 'en',
+		   vendorListVersion = 1,
+		   maxVendorId = 1171,
+		   created = aDate,
+		   lastUpdated = aDate,
+		   allowedPurposeIds = {1, 2},
+		   allowedVendorIds = {1, 2, 4},
+					      }
+    );
   end);
-
+  
   test.it('decodes the consent data from another base64-encoded string', function ()
     -- those two consents represent the same data, but with a different encoding:
     -- DefaultConsent of Range = true

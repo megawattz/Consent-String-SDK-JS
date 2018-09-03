@@ -26,7 +26,7 @@ function decodeConsentString(consentString)
    --]]
    
    local decoded = bits.decodeFromBase64(consentString);
-   utils.reveal("consentStringDecoded:"..utils.as_string(decoded))
+   -- utils.reveal("consentStringDecoded:"..utils.as_string(decoded))
    
    --utils.reveal("from list consentStringData-2:"..utils.as_string(consentStringData));
 

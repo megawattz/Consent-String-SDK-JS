@@ -387,7 +387,7 @@ local function decodeFromBase64(consentString, definitionMap)
    -- Add padding
    local unsafe = consentString
    while unsafe:len() % 4 ~= 0 do
-      unsafe = unsave .. '='
+      unsafe = unsafe .. '='
    end
    
    -- Replace safe characters
@@ -415,10 +415,8 @@ end
 
 local function decodeBitsToIds(bitString)
    bitString = bitString or ""
-   utils.reveal("bitstring:"..bitString)
    local bitarray = {}
    bitString:gsub('.', function(c) table.insert(bitarray, c) end)
-   utils.reveal("bitarray:"..utils.as_string(bitarray))
    local rval = utils.reduce(bitarray, function(acc, value, index, bitarray) 
 	 if value == '1' then
 	    if not utils.find(acc, index) then
