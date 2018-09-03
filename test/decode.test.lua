@@ -33,8 +33,10 @@ test.describe('decode', function ()
     -- those two consents represent the same data, but with a different encoding:
     -- DefaultConsent of Range = true
     local consentData = decodeConsentString('BOOMzbgOOQww_AtABAFRAb-AAAsvPA2AAKACwAF4ANgAgABTADAAGMAM8AagBrgDoAOoAdwA8gB7gEMAQ4AiQBFgCPAEkAJQASwAmABQwClAKaAVYBWQCwALIAWoAuIBdAF2AL8AYgAx4BkgGUAMyAZwBngDUAGsANiAbQBvgDkgHMAc4A6QB2QDuAO-AeQB5wD3APiAfQB-gEBAIHAQUBDICHAIgAROAioCLQEZsvI');
+    utils.reveal("consentData:"..utils.as_string(consentData))
     -- DefaultConsent of Range = false
     local consentData2 = decodeConsentString('BOOMzbgOOQww_AtABAFRAb-AAAsvOA3gACAAkABgArgBaAF0AMAA1gBuAH8AQQBSgCoAL8AYQBigDIAM0AaABpgDYAOYAdgA8AB6gD4AQoAiABFQCMAI6ASABIgCTAEqAJeATIBQQCiAKSAU4BVQCtAK-AWYBaQC2ALcAXMAvAC-gGAAYcAxQDGAGQAMsAZsA0ADTAGqANcAbMA4ADjAHKAOiAdQB1gDtgHgAeMA9AD2AHzAP4BAACBAEEAIbAREBEgCKQEXARhZeYA');
+    utils.reveal("consentData:"..utils.as_string(consentData))
 
     local toCompareWith = {
       created = Date.new("2018-05-23T07:58:14.400Z"),

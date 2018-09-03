@@ -7,30 +7,8 @@ local utils = require('utils')
     * @param {string} consentString
     --]]
 function decodeConsentString(consentString)
-   --[[
-   local
-      version,
-   vendorIdBitString,
-   vendorRangeList,
-   cmpVersion,
-   consentScreen,
-   cmpId,
-   vendorListVersion,
-   purposeIdBitString,
-   maxVendorId,
-   created,
-   lastUpdated,
-   isRange,
-   defaultConsent,
-   consentLanguage = bits.decodeFromBase64(consentString)
-   --]]
    
    local decoded = bits.decodeFromBase64(consentString);
-   -- utils.reveal("consentStringDecoded:"..utils.as_string(decoded))
-   
-   --utils.reveal("from list consentStringData-2:"..utils.as_string(consentStringData));
-
-   --utils.reveal("vendorRangeList:"..utils.as_string(vendorRangeList))
    
    local consentStringData = {
       version = decoded.version,
@@ -61,8 +39,6 @@ function decodeConsentString(consentString)
       
       consentStringData.allowedVendorIds = {};
 
-      --utils.reveal("idMap:"..utils.as_string(idMap))
-      
       for i = 1, decoded.maxVendorId, 1 do
 	 if (decoded.defaultConsent and not idMap[i]) or (not decoded.defaultConsent and idMap[i]) then
 	    if not utils.find(consentStringData.allowedVendorIds, i) then
@@ -74,7 +50,7 @@ function decodeConsentString(consentString)
       consentStringData.allowedVendorIds = bits.decodeBitsToIds(vendorIdBitString);
    end
 
-   utils.reveal(string.format("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
+   -- utils.reveal(string.format("Decode:%s=%s", consentString, utils.as_string(consentStringData)))
    
    return consentStringData;
 end

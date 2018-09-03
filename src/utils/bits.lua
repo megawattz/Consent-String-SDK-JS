@@ -91,7 +91,6 @@ local function decodeBitsToInt(bitString, start, length)
    length = length or 6
    local to_convert = bitString:sub(start, start + length - 1)
    local rval = tonumber(to_convert, 2)
-   --utils.reveal(string.format("decodeBitsToInt:%s start:%s length:%s rval:%s", bitString, start, length, rval))
    return rval
 end
 
@@ -105,17 +104,13 @@ end
 
 local function decodeBitsToLetter(bitString) 
    local letterCode = decodeBitsToInt(bitString)
-   --utils.reveal(string.format("bitString:%s letterCode:%s", bitString, letterCode))
    return string.lower(string.char(letterCode + 65))
 end
 
 local function decodeBitsToLanguage(bitString, start, length)
-   --utils.reveal(string.format("decodeBitsToLanguage: string:%s start:%s length:%s", bitString, start, length))
 
    local languageBitString = bitString:sub(start, start + length - 1)
    
-   --utils.reveal("languageBitString:"..utils.vardata(languageBitString))
-
    length = length or 0
 
    local str1 = languageBitString:sub(1, length / 2)
@@ -126,7 +121,6 @@ local function decodeBitsToLanguage(bitString, start, length)
 
    local rval = rval1..rval2
    
-   --utils.reveal(string.format("decodeBitsToLanguage: %s", rval))
    return rval
 end
 
@@ -193,23 +187,17 @@ local function decodeField(in_out_start_field)
       bitCount = numBits(output)
    end
    
-   --utils.reveal(string.format("decodeField:%s", in_out_start_field.field.name))
-   --utils.reveal(utils.as_string(in_out_start_field))
-   --utils.reveal(string.format("field: %s", utils.as_string(field)))
-   
-   --utils.reveal(string.format("decodeField:%s type:%s numBits:%s decoder:%s validator:%s listCount:%s startPosition:%s input:%s", field.name, datatype, numBits, decoder, validator, listCount, startPosition, input:sub(startPosition, startPosition+bitCount-1))) BitCount-1 causes a problem if BitCount is nil
-   
    if type(validator) == 'function' then
       if (not validator(output)) then
 	 -- Not decoding this field so make sure we start parsing the
 	 -- next field at the same point
-	 return utils.see({ newPosition = startPosition })
+	 return { newPosition = startPosition }
       end
    end
    
    if type(decoder) == 'function' then
       local rval = decoder(input, output, startPosition)
-      return utils.see(rval)
+      return rval
    end
    
    local bitCount = numBits
@@ -228,56 +216,46 @@ local function decodeField(in_out_start_field)
    local switch_type = datatype
 
    if switch_type == 'int' then
-      return utils.see({ fieldValue = decodeBitsToInt(input, startPosition, bitCount) })
+      return { fieldValue = decodeBitsToInt(input, startPosition, bitCount) }
    elseif switch_type == 'bool' then
-      return utils.see({ fieldValue = decodeBitsToBool(input, startPosition) })
+      return { fieldValue = decodeBitsToBool(input, startPosition) }
    elseif switch_type == 'date' then
-      return utils.see({ fieldValue = decodeBitsToDate(input, startPosition, bitCount) })
+      return { fieldValue = decodeBitsToDate(input, startPosition, bitCount) }
    elseif switch_type == 'bits' then
-      return utils.see({ fieldValue = input:sub(startPosition, startPosition + bitCount - 1) })
+      return { fieldValue = input:sub(startPosition, startPosition + bitCount - 1) }
    elseif switch_type == 'language' then
-      return utils.see({ fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) })
+      return { fieldValue = decodeBitsToLanguage(input, startPosition, bitCount) }
    elseif switch_type == 'list' then
       local looper = {}
       for i = 1, listEntryCount do table.insert(looper, '') end
       local rval = utils.reduce(looper,
 		   function(acc)
-		      -- utils.reveal("in acc:"..utils.as_string(acc))
 		      local decoded = decodeFields({
 			    input = input,
 			    fields = field.fields,
 			    startPosition = acc.newPosition});
-		      --utils.reveal("decoded:"..utils.as_string(decoded))
 		      table.insert(acc.fieldValue, decoded.decodedObject)
 		      local rval = {
 			 fieldValue = acc.fieldValue,
 			 newPosition = decoded.newPosition
 		      }
-		      -- utils.reveal(string.format("out acc: %s=%s", field.name,utils.as_string(rval)))
 		      return rval
 		   end,
 		   { fieldValue = {}, newPosition = startPosition })
-      -- utils.reveal("decodedList:"..utils.as_string(rval))
-      return utils.see(rval)
+      return rval
    else
       error(string.format("ConsentString - Unknown field type:%s", switch_type))
    end
 end
 
 function decodeFields(input_fields_start)
-   -- utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
-   
    local input, fields, startPosition = input_fields_start.input, input_fields_start.fields, input_fields_start.startPosition or 1;
    
-   -- utils.reveal(string.format("decodeFields:%s", utils.as_string(input_fields_start)))
-
    local position = startPosition or 1
 
-   -- utils.reveal(string.format("decodeField:%s", utils.as_string(fields)))
    local decodedObject = utils.reduce(
       fields, function(acc, field)
 	 local name, numBits = field.name, field.numBits
-	 --utils.reveal(string.format("acc1:%s %s", field.name, utils.as_string(field)))
 	 local decode = {
 	       input = input,
 	       output = acc,
@@ -287,9 +265,6 @@ function decodeFields(input_fields_start)
 	 local decoded = decodeField(decode)
 	 local fieldValue, newPosition = decoded.fieldValue, decoded.newPosition
 
-	 --utils.reveal(string.format("decode:%s fieldValue:%s newPosition:%s",
-	 --utils.as_string(decode), utils.as_string(fieldValue), newPosition))
-	 
 	 if fieldValue ~= nil then
 	    acc[name] = fieldValue
 	 end
@@ -300,11 +275,8 @@ function decodeFields(input_fields_start)
 	    position = position + numBits
 	 end
 	 
-	 --utils.reveal(string.format("acc2:%s %s", field.name, utils.as_string(acc)))
 	 return acc
 	      end, {})
-   
-   --utils.reveal("DecodeFields:"..utils.as_string(decodedObject))
    
    return {
       decodedObject = decodedObject,
@@ -358,14 +330,8 @@ end
 local function decodeConsentStringBitValue(bitString, definitionMap)
    definitionMap = definitionMap or definitions.vendorVersionMap
 
-   --utils.reveal(utils.as_string(definitionMap))
-   
-   -- utils.reveal(string.format("bitString:%s definitions.versionNumBits:%s", bitString, definitions.versionNumBits))
-
    local version = decodeBitsToInt(bitString, 1, definitions.versionNumBits)
 
-   -- utils.reveal(string.format("versionNumBits:%s version:%s",definitions.versionNumBits, version));
-   
    if type(version) ~= 'number' then
       error('ConsentString - Unknown version number in the str to decode')
    elseif not definitions.vendorVersionMap[version] then
@@ -374,8 +340,6 @@ local function decodeConsentStringBitValue(bitString, definitionMap)
 
    local fields = definitionMap[version].fields
    local rval = decodeFields({ input = bitString, fields = fields})
-
-   --utils.reveal("DecodedObject:"..utils.as_string(rval))
 
    return rval.decodedObject
 end
@@ -403,7 +367,6 @@ local function decodeFromBase64(consentString, definitionMap)
    end
    
    local rval = decodeConsentStringBitValue(inputBits, definitionMap)
-   --utils.reveal("decodeFromBase64:"..utils.as_string(rval))
    return rval
 end
 
