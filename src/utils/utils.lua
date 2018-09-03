@@ -126,7 +126,7 @@ return {
    tostringbase = tostringbase,
    reduce = reduce,
    vardata = vardata,
-   find = fine,
+   find = find,
    see = see,
    sprintf = sprintf,
    reveal = reveal

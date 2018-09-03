@@ -415,14 +415,14 @@ end
 
 local function decodeBitsToIds(bitString)
    bitString = bitString or ""
-   --utils.reveal("decodeBitsToIds:"..bitString)
-   local rval = {}
-   bitString:gsub('.', function(c) table.insert(rval, c) end)
-
-   utils.reduce(rval, function(acc, value, index, rval) 
+   utils.reveal("bitstring:"..bitString)
+   local bitarray = {}
+   bitString:gsub('.', function(c) table.insert(bitarray, c) end)
+   utils.reveal("bitarray:"..utils.as_string(bitarray))
+   local rval = utils.reduce(bitarray, function(acc, value, index, bitarray) 
 	 if value == '1' then
-	    if acc.indexOf(index + 1) == -1 then
-	       acc.push(index + 1)
+	    if not utils.find(acc, index) then
+	       table.insert(acc, index)
 	    end
 	 end
 	 return acc

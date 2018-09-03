@@ -36,7 +36,7 @@ function decodeConsentString(consentString)
       version = decoded.version,
       cmpId = decoded.cmpId,
       vendorListVersion = decoded.vendorListVersion,
-      allowedPurposeIds = bits.decodeBitsToIds(purposeIdBitString),
+      allowedPurposeIds = bits.decodeBitsToIds(decoded.purposeIdBitString),
       maxVendorId = decoded.maxVendorId,
       created = decoded.created,
       lastUpdated = decoded.lastUpdated,
